@@ -1,6 +1,6 @@
 App\Entity\Part:
     part{1..30}:
         __construct:
-            - '<md5()>'
+            - '<creditCardNumber()>'
             - '@part_name*'
             - '@manufacturer*'
