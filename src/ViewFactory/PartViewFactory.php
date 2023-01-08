@@ -20,6 +20,14 @@ class PartViewFactory
                 ->map(fn($image) => $image->getPath())
                 ->toArray(); //TODO ограничение количества, может быть очень много
 
+            if (empty($view->images)) {
+                $view->images = [
+                    "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg",
+                    "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg",
+                    "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg"
+                ];
+            }
+
             return $view;
         }
 
@@ -34,7 +42,7 @@ class PartViewFactory
         $view->partNumber = $part->getPartNumber();
         $view->manufacturer = $part->getManufacturer()->getName(); //TODO заменить на id + словарный метод для производителей
         $view->name = $part->getPartName()->getName(); //TODO translate to russian. English name is default and stored in DB
-        $view->previewImage = $part->getImages()->first()->getPath(); //TODO images collection( with path, stars, get by robot or human, etc...)
+        $view->previewImage = "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg"; //TODO images collection( with path, stars, get by robot or human, etc...)
 
         return $view;
     }

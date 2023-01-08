@@ -1,0 +1,8 @@
+### GET request with a header
+GET http://localhost/api/parts
+Accept: application/json
+
+
+### GET request with a header
+GET http://localhost/api/parts/01859184-3d0d-728c-9158-051d1bbcadee
+Accept: application/json

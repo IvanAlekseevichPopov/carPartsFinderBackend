@@ -1,0 +1,6 @@
+when@dev: &dev
+    hautelook_alice:
+        root_dirs: ['%kernel.project_dir%/tests/']
+        fixtures_path: "fixtures"
+
+when@test: *dev

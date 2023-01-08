@@ -1,0 +1,6 @@
+App\Entity\Part:
+    part{1..30}:
+        __construct:
+            - '<md5()>'
+            - '@part_name*'
+            - '@manufacturer*'
