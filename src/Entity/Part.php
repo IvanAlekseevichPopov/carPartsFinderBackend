@@ -63,4 +63,16 @@ class Part
     {
         return $this->partName;
     }
+
+    public function getManufacturer(): Manufacturer
+    {
+        return $this->manufacturer;
+    }
+
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+
 }
