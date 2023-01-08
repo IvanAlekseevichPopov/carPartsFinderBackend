@@ -12,7 +12,6 @@ use Ramsey\Uuid\Uuid;
  * @ORM\Table
  * @ORM\Entity(repositoryClass="App\Repository\PartRepository")
  */
-
 class Part
 {
 
