@@ -14,7 +14,14 @@ sonata_admin:
             - { type: sonata.admin.block.admin_list, position: left }
 
 services:
-    admin.staff_user:
+    admin.part:
         class: App\Admin\PartAdmin
         tags:
             - { name: sonata.admin, model_class: App\Entity\Part, manager_type: orm, label: Parts }
+
+    admin.part_image:
+        class: App\Admin\ImageAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Image, manager_type: orm, label: Images }
+        calls:
+            - [setStorage, ['@oneup_flysystem.default_filesystem_filesystem']]
