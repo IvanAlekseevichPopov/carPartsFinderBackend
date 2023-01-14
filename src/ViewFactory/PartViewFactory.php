@@ -42,7 +42,8 @@ class PartViewFactory
         $view->partNumber = $part->getPartNumber();
         $view->manufacturer = $part->getManufacturer()->getName(); //TODO заменить на id + словарный метод для производителей
         $view->name = $part->getPartName()->getName(); //TODO translate to russian. English name is default and stored in DB
-        $view->previewImage = "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg"; //TODO images collection( with path, stars, get by robot or human, etc...)
+        $view->images = $part->getImages(); //TODO fix api
+//        $view->previewImage = "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg"; //TODO images collection( with path, stars, get by robot or human, etc...)
 
         return $view;
     }

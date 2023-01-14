@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\DBAL\Types\Enum\ViewTypeEnum;
+use App\Entity\Image;
 use App\Entity\Part;
 use App\Form\Query\BaseQueryType;
 use App\Model\Query\BaseQuery;
 use App\Model\View\PartView;
 use App\Repository\PartRepository;
 use App\ViewFactory\PartViewFactory;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PartController extends AbstractController
@@ -22,7 +27,7 @@ class PartController extends AbstractController
         Request         $request,
         PartRepository  $partRepository,
         PartViewFactory $viewFactory,
-    )
+    ): array|FormInterface
     {
         $query = new BaseQuery();
 
@@ -44,5 +49,18 @@ class PartController extends AbstractController
     ): PartView
     {
         return $viewFactory->creatSingleView($part, ViewTypeEnum::DETAILED_ITEM);
+    }
+
+    #[Route('/api/images/{id}')]
+    public function getImage(Image $image, FilesystemOperator $operator): Response
+    {
+        try {
+            //TODO content type from image data or always png
+            //TODO resize as rcorp??
+            return new Response($operator->read( $image->getFilePath()), Response::HTTP_OK, ['Content-Type' =>  'image/png']);
+        } catch (FilesystemException $e) {
+            //TODO вернуть заглушку с коротким ttl и critical в лог
+            return new Response("Image not found");
+        }
     }
 }
