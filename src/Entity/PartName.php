@@ -22,7 +22,7 @@ class PartName
     /**
      * @ORM\Column
      */
-    protected string $name = ''; //todo trasnlation
+    protected string $name = ''; // todo trasnlation
 
     public function getName(): string
     {
@@ -38,5 +38,4 @@ class PartName
     {
         $this->name = $name;
     }
-
 }

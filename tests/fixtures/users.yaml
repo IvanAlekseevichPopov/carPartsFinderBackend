@@ -1,0 +1,9 @@
+parameters:
+  passwd: '$2y$13$LzElYoL7nPTOUCaPBQpMLOQh8pKwwwm5kF3Ogayaiv.LvMWs12Mhq'
+
+App\Entity\User:
+  admin1:
+    email: 'dev@dev.com'
+    password: '<{passwd}>'
+    __calls:
+      - makeAdmin: []

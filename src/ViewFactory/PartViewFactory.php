@@ -11,27 +11,29 @@ use App\Model\View\PartView;
 
 class PartViewFactory
 {
+    private ImageViewFactory $imageViewFactory;
+
+    public function __construct(ImageViewFactory $imageViewFactory)
+    {
+        $this->imageViewFactory = $imageViewFactory;
+    }
+
     private function createBaseView(Part $part, $viewType = ViewTypeEnum::LIST_ITEM): PartView
     {
-        if ($viewType == ViewTypeEnum::DETAILED_ITEM) {
+        if (ViewTypeEnum::DETAILED_ITEM == $viewType) {
             $view = new PartDetailedView();
-            $view->images = $part
-                ->getImages()
-                ->map(fn($image) => $image->getPath())
-                ->toArray(); //TODO ограничение количества, может быть очень много
-
-            if (empty($view->images)) {
-                $view->images = [
-                    "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg",
-                    "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg",
-                    "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg"
-                ];
-            }
+            $view->images = $this->imageViewFactory->createListView($part->getImages()->toArray());
 
             return $view;
         }
 
-        return new PartView();
+        $view = new PartView();
+        $firstImage = $part->getImages()->first();
+        if ($firstImage) {
+            $view->previewImage = $firstImage->getId();
+        }
+
+        return $view;
     }
 
     public function creatSingleView(Part $part, ViewTypeEnum $viewType = ViewTypeEnum::LIST_ITEM): PartView
@@ -40,9 +42,8 @@ class PartViewFactory
 
         $view->id = $part->getId();
         $view->partNumber = $part->getPartNumber();
-        $view->manufacturer = $part->getManufacturer()->getName(); //TODO заменить на id + словарный метод для производителей
-        $view->name = $part->getPartName()->getName(); //TODO translate to russian. English name is default and stored in DB
-        $view->previewImage = "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg"; //TODO images collection( with path, stars, get by robot or human, etc...)
+        $view->manufacturer = $part->getManufacturer()->getName(); // TODO заменить на id + словарный метод для производителей
+        $view->name = $part->getPartName()->getName(); // TODO translate to russian. English name is default and stored in DB
 
         return $view;
     }

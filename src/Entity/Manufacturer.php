@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Entity;
@@ -21,7 +22,7 @@ class Manufacturer
     /**
      * @ORM\Column
      */
-    protected string $name = ''; //todo trasnlation
+    protected string $name = ''; // todo trasnlation
 
     public function getName(): string
     {
@@ -37,5 +38,4 @@ class Manufacturer
     {
         $this->name = $name;
     }
-
 }

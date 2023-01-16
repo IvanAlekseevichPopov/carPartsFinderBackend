@@ -7,7 +7,6 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-
 final class Version20230107133123 extends AbstractMigration
 {
     public function getDescription(): string
@@ -37,7 +36,6 @@ final class Version20230107133123 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('CREATE SCHEMA public');
         $this->addSql('ALTER TABLE image DROP CONSTRAINT FK_C53D045F4CE34BEC');
         $this->addSql('ALTER TABLE part DROP CONSTRAINT FK_490F70C6F14B6BDD');
         $this->addSql('ALTER TABLE part DROP CONSTRAINT FK_490F70C6A23B42D');
