@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Part;
 use App\Model\Query\BaseQueryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Entity\Part;
 
 /**
  * @method Part findOneBy(array $criteria, array $orderBy = null)

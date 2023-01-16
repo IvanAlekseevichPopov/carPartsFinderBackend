@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Entity\File\PartImage;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
@@ -14,7 +15,6 @@ use Ramsey\Uuid\Uuid;
  */
 class Part
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="uuid", unique=true)
@@ -37,10 +37,11 @@ class Part
     protected Manufacturer $manufacturer;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Image", mappedBy="part")
+     * @ORM\OneToMany(targetEntity="App\Entity\File\PartImage", mappedBy="part", cascade={"persist", "remove"})
      */
     protected Collection $images;
 
+    // TODO rename partName to category or group
     public function __construct(string $partNumber, PartName $partName, Manufacturer $manufacturer)
     {
         $this->partNumber = $partNumber;
@@ -74,5 +75,15 @@ class Part
         return $this->images;
     }
 
+    public function addImage(PartImage $image): void
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+        }
+    }
 
+    public function removeImage(PartImage $image): void
+    {
+        $this->images->removeElement($image);
+    }
 }

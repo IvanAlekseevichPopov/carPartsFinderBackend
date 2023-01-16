@@ -13,18 +13,18 @@ class PartViewFactory
 {
     private function createBaseView(Part $part, $viewType = ViewTypeEnum::LIST_ITEM): PartView
     {
-        if ($viewType == ViewTypeEnum::DETAILED_ITEM) {
+        if (ViewTypeEnum::DETAILED_ITEM == $viewType) {
             $view = new PartDetailedView();
             $view->images = $part
                 ->getImages()
-                ->map(fn($image) => $image->getPath())
-                ->toArray(); //TODO ограничение количества, может быть очень много
+                ->map(fn ($image) => $image->getPath())
+                ->toArray(); // TODO ограничение количества, может быть очень много
 
             if (empty($view->images)) {
                 $view->images = [
-                    "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg",
-                    "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg",
-                    "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg"
+                    'https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg',
+                    'https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg',
+                    'https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg',
                 ];
             }
 
@@ -40,9 +40,9 @@ class PartViewFactory
 
         $view->id = $part->getId();
         $view->partNumber = $part->getPartNumber();
-        $view->manufacturer = $part->getManufacturer()->getName(); //TODO заменить на id + словарный метод для производителей
-        $view->name = $part->getPartName()->getName(); //TODO translate to russian. English name is default and stored in DB
-        $view->images = $part->getImages(); //TODO fix api
+        $view->manufacturer = $part->getManufacturer()->getName(); // TODO заменить на id + словарный метод для производителей
+        $view->name = $part->getPartName()->getName(); // TODO translate to russian. English name is default and stored in DB
+        $view->images = $part->getImages(); // TODO fix api
 //        $view->previewImage = "https://gottuned.com/wp-content/uploads/2019/12/1.9tdi-gottuned.com_-scaled.jpg"; //TODO images collection( with path, stars, get by robot or human, etc...)
 
         return $view;

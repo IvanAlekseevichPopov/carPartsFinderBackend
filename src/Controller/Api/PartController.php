@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\DBAL\Types\Enum\ViewTypeEnum;
-use App\Entity\Image;
+use App\Entity\File\Image;
 use App\Entity\Part;
 use App\Form\Query\BaseQueryType;
 use App\Model\Query\BaseQuery;
@@ -24,11 +24,10 @@ class PartController extends AbstractController
 {
     #[Route('/api/parts')]
     public function getPartsList(
-        Request         $request,
-        PartRepository  $partRepository,
+        Request $request,
+        PartRepository $partRepository,
         PartViewFactory $viewFactory,
-    ): array|FormInterface
-    {
+    ): array|FormInterface {
         $query = new BaseQuery();
 
         $form = $this->createForm(BaseQueryType::class, $query);
@@ -44,23 +43,22 @@ class PartController extends AbstractController
 
     #[Route('/api/parts/{id}')]
     public function getOnePart(
-        Part            $part,
+        Part $part,
         PartViewFactory $viewFactory,
-    ): PartView
-    {
+    ): PartView {
         return $viewFactory->creatSingleView($part, ViewTypeEnum::DETAILED_ITEM);
     }
 
-    #[Route('/api/images/{id}')]
+    #[Route('/api/images/{id}', name: 'api_download_image', methods: ['GET'])]
     public function getImage(Image $image, FilesystemOperator $operator): Response
     {
         try {
-            //TODO content type from image data or always png
-            //TODO resize as rcorp??
-            return new Response($operator->read( $image->getFilePath()), Response::HTTP_OK, ['Content-Type' =>  'image/png']);
+            // TODO content type from image data or always png
+            // TODO resize as rcorp??
+            return new Response($operator->read($image->getStorageFilePath()), Response::HTTP_OK, ['Content-Type' => 'image/png']);
         } catch (FilesystemException $e) {
-            //TODO вернуть заглушку с коротким ttl и critical в лог
-            return new Response("Image not found");
+            // TODO вернуть image заглушку с коротким ttl и critical в лог
+            return new Response('Image not found', Response::HTTP_NOT_FOUND);
         }
     }
 }

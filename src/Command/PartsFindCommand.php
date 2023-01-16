@@ -8,7 +8,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:parts:find',
@@ -26,10 +25,11 @@ class PartsFindCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        for ($i=0; $i < 100; $i++) {
+        for ($i = 0; $i < 100; ++$i) {
             sleep(10);
             $output->writeln("$i. Still working...");
         }
+
         return Command::SUCCESS;
     }
 }

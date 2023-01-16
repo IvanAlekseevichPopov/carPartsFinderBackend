@@ -7,7 +7,7 @@ namespace App\Entity;
 use App\DBAL\Types\Enum\UserRoleTypeEnum;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * )
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
-class User implements UserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -54,7 +54,7 @@ class User implements UserInterface
 
     public function getUsername(): string
     {
-        return (string)$this->getEmail();
+        return (string) $this->getEmail();
     }
 
     public function getUserIdentifier(): string
@@ -96,6 +96,11 @@ class User implements UserInterface
         if (!in_array($role, $this->roles)) {
             $this->roles[] = $role;
         }
+    }
+
+    public function makeAdmin(): void
+    {
+        $this->addRole(UserRoleTypeEnum::ROLE_ADMIN);
     }
 
     public function removeRole(string $role): void

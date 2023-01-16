@@ -9,6 +9,11 @@ sonata_block:
 
 sonata_admin:
     title: 'Sonata Admin'
+    assets:
+        extra_stylesheets:
+            - app/css/admin.css
+        extra_javascripts:
+            - app/js/admin.js
     dashboard:
         blocks:
             - { type: sonata.admin.block.admin_list, position: left }
@@ -18,10 +23,14 @@ services:
         class: App\Admin\PartAdmin
         tags:
             - { name: sonata.admin, model_class: App\Entity\Part, manager_type: orm, label: Parts }
+        calls:
+            - [ setRouter, [ '@router' ] ]
+            - [ setDataMapper, [ '@App\Form\DataMapper\PartDataMapper' ] ]
 
     admin.part_image:
         class: App\Admin\ImageAdmin
         tags:
-            - { name: sonata.admin, model_class: App\Entity\Image, manager_type: orm, label: Images }
+            - { name: sonata.admin, model_class: App\Entity\File\PartImage, manager_type: orm, label: Part Images }
         calls:
-            - [setStorage, ['@oneup_flysystem.default_filesystem_filesystem']]
+            - [ setFileSystemOperator, [ '@oneup_flysystem.default_filesystem_filesystem' ] ]
+            - [ setTokenStorage, [ '@security.token_storage' ] ]
