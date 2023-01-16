@@ -9,8 +9,11 @@ use App\Entity\File\Image;
 use App\Entity\Part;
 use App\Form\Query\BaseQueryType;
 use App\Model\Query\BaseQuery;
+use App\Model\Query\PartImageQuery;
 use App\Model\View\PartView;
+use App\Repository\PartImageRepository;
 use App\Repository\PartRepository;
+use App\ViewFactory\ImageViewFactory;
 use App\ViewFactory\PartViewFactory;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
@@ -33,7 +36,7 @@ class PartController extends AbstractController
         $form = $this->createForm(BaseQueryType::class, $query);
         $form->submit($request->query->all(), false);
         if (!$form->isValid()) {
-            return $form;
+            return $form; // TODO exception
         }
 
         $partsList = $partRepository->findByQuery($query);
@@ -41,6 +44,7 @@ class PartController extends AbstractController
         return $viewFactory->createListView($partsList);
     }
 
+    // TODO remove???? what about manufacturer?
     #[Route('/api/parts/{id}')]
     public function getOnePart(
         Part $part,
@@ -49,7 +53,27 @@ class PartController extends AbstractController
         return $viewFactory->creatSingleView($part, ViewTypeEnum::DETAILED_ITEM);
     }
 
-    #[Route('/api/images/{id}', name: 'api_download_image', methods: ['GET'])]
+    #[Route('/api/parts/{id}/images')]
+    public function getPartImages(
+        Part $part,
+        Request $request,
+        PartImageRepository $partImageRepository,
+        ImageViewFactory $viewFactory,
+    ): array|FormInterface {
+        $query = new PartImageQuery($part);
+
+        $form = $this->createForm(BaseQueryType::class, $query);
+        $form->submit($request->query->all());
+        if (!$form->isValid()) {
+            return $form; // TODO exception
+        }
+
+        $imageList = $partImageRepository->findByQuery($query);
+
+        return $viewFactory->createListView($imageList);
+    }
+
+    #[Route('/api/files/{id}', name: 'api_download_image', methods: ['GET'])]
     public function getImage(Image $image, FilesystemOperator $operator): Response
     {
         try {

@@ -6,9 +6,9 @@ namespace App\Model\Query;
 
 class BaseQuery implements BaseQueryInterface
 {
-    protected int $limit = 5;
+    protected int $limit = BaseQueryInterface::DEFAULT_LIMIT;
 
-    protected int $offset = 0;
+    protected int $offset = BaseQueryInterface::DEFAULT_OFFSET;
 
     public function getLimit(): int
     {
