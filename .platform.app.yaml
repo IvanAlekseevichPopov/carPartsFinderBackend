@@ -63,7 +63,7 @@ crons:
         # Check that no security issues have been found for PHP packages deployed in production
         # See https://github.com/fabpot/local-php-security-checker
         spec: '*/5 * * * *'
-        cmd: if [ "$PLATFORM_BRANCH" = "dev" ]; then symfony console --time-limit=3600 --memory-limit=64M app:parts:find ; fi
+        cmd: if [ "$PLATFORM_BRANCH" = "dev" ]; then symfony console app:parts:find ; fi
 
 workers:
     messenger:

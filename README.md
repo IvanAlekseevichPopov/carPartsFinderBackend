@@ -8,12 +8,12 @@ TODO
 +add api of collection of images with rating
 
 
+
 image resize and change type to lightest(PNG?) right after upload
 add test provider for image storing
 add flag for moderation to parts and images
 add icon who added image(robot, user, moderator)
 merge all migrations to one
-update api
 image remove from part edit form in admin panel
 
 
