@@ -8,6 +8,10 @@ TODO
 +add api of collection of images with rating
 
 
+add simple crawler
+
+
+
 
 image resize and change type to lightest(PNG?) right after upload
 add test provider for image storing

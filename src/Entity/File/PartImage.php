@@ -23,9 +23,9 @@ class PartImage extends Image
      */
     protected ?int $rating = null;
 
-    public function __construct(User $uploadedBy, Part $part)
+    public function __construct(User $uploadedBy, Part $part, string $checkSum)
     {
-        parent::__construct($uploadedBy);
+        parent::__construct($uploadedBy, $checkSum);
         $this->part = $part;
         $part->addImage($this);
     }

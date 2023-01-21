@@ -32,12 +32,16 @@ class File
      */
     protected User $uploadedBy;
 
-    protected ?UploadedFile $file = null;
+    /**
+     * @ORM\Column
+     */
+    private string $checkSum;
 
-    public function __construct(User $uploadedBy)
+    public function __construct(User $uploadedBy, string $checkSum)
     {
         $this->id = Uuid::uuid7()->toString();
         $this->uploadedBy = $uploadedBy;
+        $this->checkSum = $checkSum;
     }
 
     public function getId(): string
@@ -50,18 +54,13 @@ class File
         return '/tmp/'.$this->getId();
     }
 
-    public function getFile(): ?UploadedFile
-    {
-        return $this->file;
-    }
-
-    public function setFile(?UploadedFile $file): void
-    {
-        $this->file = $file;
-    }
-
     public function getUploadedBy(): User
     {
         return $this->uploadedBy;
+    }
+
+    public function getCheckSum(): string
+    {
+        return $this->checkSum;
     }
 }

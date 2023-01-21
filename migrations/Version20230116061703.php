@@ -16,7 +16,7 @@ final class Version20230116061703 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE file (id UUID NOT NULL, uploaded_by_id UUID DEFAULT NULL, part_id UUID DEFAULT NULL, document_type INT NOT NULL, rating INT DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE file (id UUID NOT NULL, uploaded_by_id UUID DEFAULT NULL, part_id UUID DEFAULT NULL, document_type INT NOT NULL, rating INT DEFAULT NULL, check_sum VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_8C9F3610A2B28FE8 ON file (uploaded_by_id)');
         $this->addSql('CREATE INDEX IDX_8C9F36104CE34BEC ON file (part_id)');
         $this->addSql('COMMENT ON COLUMN file.id IS \'(DC2Type:uuid)\'');
