@@ -17,8 +17,10 @@ use App\ViewFactory\ImageViewFactory;
 use App\ViewFactory\PartViewFactory;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -74,15 +76,29 @@ class PartController extends AbstractController
     }
 
     #[Route('/api/files/{id}', name: 'api_download_image', methods: ['GET'])]
-    public function getImage(Image $image, FilesystemOperator $operator): Response
+    public function getImage(Image $image, FilesystemOperator $operator, LoggerInterface $logger): Response
     {
         try {
+//           TODO checksum сравнение и логгирование несовпадений
+//            dump(
+//                $operator->checksum($image->getStorageFilePath()),
+//                $image->getCheckSum()
+//            );
             // TODO content type from image data or always png
             // TODO resize as rcorp??
-            return new Response($operator->read($image->getStorageFilePath()), Response::HTTP_OK, ['Content-Type' => 'image/png']);
+            return new Response(
+                $operator->read($image->getStorageFilePath()),
+                Response::HTTP_OK,
+                ['Content-Type' => 'image/png', 'max-age' => 10800] //3 hours
+            );
         } catch (FilesystemException $e) {
-            // TODO вернуть image заглушку с коротким ttl и critical в лог
-            return new Response('Image not found', Response::HTTP_NOT_FOUND);
+            $logger->warning("Unable to download image: {$image->getId()}", ['exception' => $e]);
+
+            return new BinaryFileResponse(
+                $this->getParameter('kernel.project_dir') . '/public/app/img/404.png',
+                Response::HTTP_OK,
+                ['Content-Type' => 'image/png', 'max-age' => 300] //5 min
+            );
         }
     }
 }
