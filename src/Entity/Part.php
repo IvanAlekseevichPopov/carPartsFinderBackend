@@ -32,9 +32,9 @@ class Part
     protected PartName $partName;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Manufacturer")
+     * @ORM\ManyToOne(targetEntity="Brand")
      */
-    protected Manufacturer $manufacturer;
+    protected Brand $brand;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\File\PartImage", mappedBy="part", cascade={"persist", "remove"})
@@ -42,11 +42,11 @@ class Part
     protected Collection $images;
 
     // TODO rename partName to category or group
-    public function __construct(string $partNumber, PartName $partName, Manufacturer $manufacturer)
+    public function __construct(string $partNumber, PartName $partName, Brand $brand)
     {
         $this->partNumber = $partNumber;
         $this->partName = $partName;
-        $this->manufacturer = $manufacturer;
+        $this->brand = $brand;
         $this->id = Uuid::uuid7()->toString();
     }
 
@@ -65,9 +65,9 @@ class Part
         return $this->partName;
     }
 
-    public function getManufacturer(): Manufacturer
+    public function getBrand(): Brand
     {
-        return $this->manufacturer;
+        return $this->brand;
     }
 
     public function getImages(): Collection

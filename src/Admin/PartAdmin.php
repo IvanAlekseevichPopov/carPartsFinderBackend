@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Admin;
 
-use App\Entity\Manufacturer;
+use App\Entity\Brand;
 use App\Entity\Part;
 use App\Entity\PartName;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
@@ -73,7 +73,7 @@ class PartAdmin extends AbstractAdmin
                 'choice_label' => 'name',
             ])
             ->add('manufacturer', EntityType::class, [
-                'class' => Manufacturer::class,
+                'class' => Brand::class,
                 'choice_label' => 'name',
             ])
             ->add('images', FileType::class, $fileFieldOptions)
