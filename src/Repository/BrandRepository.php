@@ -26,7 +26,7 @@ class BrandRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('manufacturer');
 
         return $qb
-            ->where('manufacturer.id = 17') // todo remove. it's HONDA
+            ->where('manufacturer.id != 17') // todo remove. it's HONDA
             ->getQuery()
             ->getResult();
     }
