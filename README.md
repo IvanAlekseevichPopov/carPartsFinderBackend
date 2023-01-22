@@ -8,7 +8,9 @@ TODO
 +add api of collection of images with rating
 
 
-add simple crawler
+add simple partNumbers crawler
+
+add simple images crawler
 
 
 
