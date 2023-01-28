@@ -28,10 +28,10 @@ class CarModel
     #[ORM\Column(type: 'integer', unique: true)]
     protected int $externalId;
 
-    #[ORM\Column(type: 'date_immutable')]
+    #[ORM\Column(type: 'date_immutable', nullable: true)]
     protected ?\DateTimeImmutable $productionStart = null;
 
-    #[ORM\Column(type: 'date_immutable')]
+    #[ORM\Column(type: 'date_immutable', nullable: true)]
     protected ?\DateTimeImmutable $productionFinish = null;
 
     public function __construct(Brand $brand, string $defaultLocaleName, int $externalId)

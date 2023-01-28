@@ -22,12 +22,13 @@ class BrandRepository extends ServiceEntityRepository
     /**
      * @return Brand[]
      */
-    public function findAllToParse(): array
+    public function findAllToParseModels(): array
     {
         $qb = $this->createQueryBuilder('brand');
 
         return $qb
-//            ->where('manufacturer.id != 17') // todo remove. it's HONDA
+            ->where($qb->expr()->eq('brand.childrenModelsParsed', ":alreadyParsed"))
+            ->setParameter('alreadyParsed', false)
             ->getQuery()
             ->getResult();
     }
