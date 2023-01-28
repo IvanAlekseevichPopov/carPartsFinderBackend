@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Admin\SonataController;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

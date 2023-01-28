@@ -89,15 +89,15 @@ class PartController extends AbstractController
             return new Response(
                 $operator->read($image->getStorageFilePath()),
                 Response::HTTP_OK,
-                ['Content-Type' => 'image/png', 'max-age' => 10800] //3 hours
+                ['Content-Type' => 'image/png', 'max-age' => 10800] // 3 hours
             );
         } catch (FilesystemException $e) {
             $logger->warning("Unable to download image: {$image->getId()}", ['exception' => $e]);
 
             return new BinaryFileResponse(
-                $this->getParameter('kernel.project_dir') . '/public/app/img/404.png',
+                $this->getParameter('kernel.project_dir').'/public/app/img/404.png',
                 Response::HTTP_OK,
-                ['Content-Type' => 'image/png', 'max-age' => 300] //5 min
+                ['Content-Type' => 'image/png', 'max-age' => 300] // 5 min
             );
         }
     }

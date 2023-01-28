@@ -9,39 +9,30 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 
-/**
- * @ORM\Table
- * @ORM\Entity(repositoryClass="App\Repository\PartRepository")
- */
+#[ORM\Table(
+    indexes: [
+        new ORM\Index(columns: ['part_number']),
+    ]
+)]
+#[ORM\Entity(repositoryClass: 'App\Repository\PartRepository')]
 class Part
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
     protected string $id;
 
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     protected string $partNumber;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\PartName")
-     */
+    #[ORM\ManyToOne(targetEntity: PartName::class)]
     protected PartName $partName;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Brand")
-     */
+    #[ORM\ManyToOne(targetEntity: Brand::class)]
     protected Brand $brand;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\File\PartImage", mappedBy="part", cascade={"persist", "remove"})
-     */
+    #[ORM\OneToMany(mappedBy: 'part', targetEntity: PartImage::class, cascade: ['persist', 'remove'])]
     protected Collection $images;
 
-    // TODO rename partName to category or group
     public function __construct(string $partNumber, PartName $partName, Brand $brand)
     {
         $this->partNumber = $partNumber;
@@ -75,15 +66,15 @@ class Part
         return $this->images;
     }
 
-    public function addImage(PartImage $image): void
-    {
-        if (!$this->images->contains($image)) {
-            $this->images->add($image);
-        }
-    }
-
-    public function removeImage(PartImage $image): void
-    {
-        $this->images->removeElement($image);
-    }
+//    public function addImage(PartImage $image): void
+//    {
+//        if (!$this->images->contains($image)) {
+//            $this->images->add($image);
+//        }
+//    }
+//
+//    public function removeImage(PartImage $image): void
+//    {
+//        $this->images->removeElement($image);
+//    }
 }

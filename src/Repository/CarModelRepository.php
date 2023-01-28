@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\Brand;
 use App\Entity\CarModel;
-use App\Entity\Part;
-use App\Model\Query\BaseQueryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,5 +18,4 @@ class CarModelRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, CarModel::class);
     }
-
 }

@@ -14,7 +14,6 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 
 class PartAdmin extends AbstractAdmin
@@ -59,7 +58,6 @@ class PartAdmin extends AbstractAdmin
 
         return $fileFieldOptions;
     }
-
 
     protected function configureFormFields(FormMapper $form): void
     {
