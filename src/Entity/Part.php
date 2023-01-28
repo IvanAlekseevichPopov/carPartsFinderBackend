@@ -33,6 +33,12 @@ class Part
     #[ORM\OneToMany(mappedBy: 'part', targetEntity: PartImage::class, cascade: ['persist', 'remove'])]
     protected Collection $images;
 
+    #[ORM\Column(type: 'json', options: ['jsonb' => true])]
+    protected array $suitableForModels = []; // TODO remove if not needed after parsing is finished
+
+    #[ORM\Column(type: 'json', nullable: true, options: ['jsonb' => true])]
+    private ?array $imagesToParse; // TODO remove after parsing is finished
+
     public function __construct(string $partNumber, PartName $partName, Brand $brand)
     {
         $this->partNumber = $partNumber;
@@ -66,15 +72,21 @@ class Part
         return $this->images;
     }
 
-//    public function addImage(PartImage $image): void
-//    {
-//        if (!$this->images->contains($image)) {
-//            $this->images->add($image);
-//        }
-//    }
-//
-//    public function removeImage(PartImage $image): void
-//    {
-//        $this->images->removeElement($image);
-//    }
+    public function addSuitableModel(CarModel $model): void
+    {
+        if (in_array($model->getId(), $this->suitableForModels)) {
+            return;
+        }
+        $this->suitableForModels[] = $model->getId();
+    }
+
+    public function setImagesToParse(array $images)
+    {
+        $this->imagesToParse = $images;
+    }
+
+    public function getImagesToParse(): ?array
+    {
+        return $this->imagesToParse;
+    }
 }

@@ -27,7 +27,7 @@ class BrandRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('brand');
 
         return $qb
-            ->where($qb->expr()->eq('brand.childrenModelsParsed', ":alreadyParsed"))
+            ->where($qb->expr()->eq('brand.childrenModelsParsed', ':alreadyParsed'))
             ->setParameter('alreadyParsed', false)
             ->getQuery()
             ->getResult();

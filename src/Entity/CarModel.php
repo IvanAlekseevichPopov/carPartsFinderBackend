@@ -28,11 +28,17 @@ class CarModel
     #[ORM\Column(type: 'integer', unique: true)]
     protected int $externalId;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    protected bool $childrenPartsParsed = false;
+
     #[ORM\Column(type: 'date_immutable', nullable: true)]
     protected ?\DateTimeImmutable $productionStart = null;
 
     #[ORM\Column(type: 'date_immutable', nullable: true)]
     protected ?\DateTimeImmutable $productionFinish = null;
+
+    #[ORM\Column(type: 'json', nullable: true, options: ['jsonb' => true])]
+    private ?array $modifications = null;
 
     public function __construct(Brand $brand, string $defaultLocaleName, int $externalId)
     {
@@ -84,5 +90,25 @@ class CarModel
     public function setProductionFinish(?\DateTimeImmutable $productionFinish): void
     {
         $this->productionFinish = $productionFinish;
+    }
+
+    public function isChildrenPartsParsed(): bool
+    {
+        return $this->childrenPartsParsed;
+    }
+
+    public function setChildrenPartsParsed(bool $childrenPartsParsed): void
+    {
+        $this->childrenPartsParsed = $childrenPartsParsed;
+    }
+
+    public function getModifications(): ?array
+    {
+        return $this->modifications;
+    }
+
+    public function setModifications(?array $modifications): void
+    {
+        $this->modifications = $modifications;
     }
 }

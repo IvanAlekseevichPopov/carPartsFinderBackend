@@ -18,4 +18,21 @@ class CarModelRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, CarModel::class);
     }
+
+    /**
+     * @return CarModel[]
+     */
+    public function findAllToParsePartsNumbers(): array
+    {
+        $qb = $this->createQueryBuilder('cm');
+
+        return $qb
+            ->where($qb->expr()->eq('cm.childrenPartsParsed', ':alreadyParsed'))
+            ->andWhere($qb->expr()->eq('cm.id', ':id'))
+            ->setParameter('alreadyParsed', false)
+            ->setParameter('id', 2329)
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Repository\PartNameRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(
@@ -11,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
         new ORM\Index(columns: ['name']),
     ]
 )]
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PartNameRepository::class)]
 class PartName
 {
     #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
