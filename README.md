@@ -20,6 +20,8 @@ add flag for moderation to parts and images
 add icon who added image(robot, user, moderator)
 merge all migrations to one
 image remove from part edit form in admin panel
+code style checker(fixer + psalm)
+simple dumb tests on container, api, admin panel
 
 
 <p align="center">
