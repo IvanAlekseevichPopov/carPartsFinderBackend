@@ -12,6 +12,7 @@ use App\Repository\PartNameRepository;
 use App\Repository\PartRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -34,9 +35,9 @@ class PartsNumbersSearchCommand extends Command
     private PartNameRepository $partNameRepository;
     private PartRepository $partRepository;
     private FilesystemAdapter $cache;
+    private ClientInterface $client;
 
     private SymfonyStyle $io;
-    private Client $client;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -44,7 +45,7 @@ class PartsNumbersSearchCommand extends Command
         CarModelRepository $carModelRepository,
         PartNameRepository $partNameRepository,
         PartRepository $partRepository,
-        Client $client,
+        ClientInterface $parserClient,
         FilesystemAdapter $cache,
         string $name = null
     ) {
@@ -56,7 +57,7 @@ class PartsNumbersSearchCommand extends Command
         $this->partNameRepository = $partNameRepository;
         $this->partRepository = $partRepository;
         $this->cache = $cache;
-        $this->client = $client;
+        $this->client = $parserClient;
     }
 
     protected function configure(): void
