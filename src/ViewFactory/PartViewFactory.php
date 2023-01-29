@@ -42,7 +42,7 @@ class PartViewFactory
 
         $view->id = $part->getId();
         $view->partNumber = $part->getPartNumber();
-        $view->manufacturer = $part->getManufacturer()->getName(); // TODO заменить на id + словарный метод для производителей
+        $view->manufacturer = $part->getBrand()->getName(); // TODO заменить на id + словарный метод для производителей
         $view->name = $part->getPartName()->getName(); // TODO translate to russian. English name is default and stored in DB
 
         return $view;

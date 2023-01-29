@@ -10,6 +10,7 @@ services:
       - trash:/var/www/
     expose:
       - "9000"
+    entrypoint: ./docker/dev/php/docker-entrypoint.sh
   nginx:
     image: nginx
     depends_on:

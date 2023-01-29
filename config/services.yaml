@@ -24,3 +24,12 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    Symfony\Component\Cache\Adapter\FilesystemAdapter:
+        arguments:
+            - 'cache.app'
+            - 0
+            - '%kernel.project_dir%/var/storage'
+
+    GuzzleHttp\Client:
+        factory: ['App\Service\Factory\ParserClientFactory', 'create']
+        arguments: ['%env(SOURCE_API_BASE_URL)%', '%env(SOURCE_SITE_BASE_URL)%']
