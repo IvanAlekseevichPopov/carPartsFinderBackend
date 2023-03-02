@@ -1,0 +1,17 @@
+import: 
+  - recipe/symfony.php
+
+config:
+  repository: 'git@github.com:IvanAlekseevichPopov/carPartsFinderBackend.git'
+
+hosts:
+  :
+    remote_user: deployer
+    deploy_path: '~/html'
+
+tasks:
+  build:
+    - run: uptime  
+
+after:
+  deploy:failed: deploy:unlock
