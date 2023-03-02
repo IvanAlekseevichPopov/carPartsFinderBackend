@@ -35,3 +35,17 @@ ul.treeview-menu.menu_level_1 {
 .admin-preview-image {
     max-width: 100px;
 }
+/* Preview for parts list with fancybox */
+.list-preview-image {
+    max-height: 50px;
+    max-width: 50px;
+}
+
+/* To hide fancybox */
+div.loader_website {
+    z-index: 99999;
+}
+
+div.swal2-container {
+    z-index: 99999
+}

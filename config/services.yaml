@@ -39,4 +39,4 @@ services:
         arguments: ['%env(SOURCE_API_BASE_URL)%', '%env(SOURCE_SITE_BASE_URL)%']
 
     App\Service\Guzzle\DownloadClientInterface:
-        class: App\Service\Guzzle\Client
+        class: App\Service\Guzzle\DownloadClient
