@@ -3,7 +3,7 @@ import:
 
 config:
   repository: 'https://github.com/IvanAlekseevichPopov/carPartsFinderBackend.git'
-  git_tty: true
+  composer_options: '--verbose --prefer-dist --no-progress --no-interaction --dev --optimize-autoloader'
 
 hosts:
     82.146.37.186:
