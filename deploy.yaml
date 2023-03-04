@@ -4,6 +4,7 @@ import:
 config:
   repository: 'https://github.com/IvanAlekseevichPopov/carPartsFinderBackend.git'
   composer_options: '--verbose --prefer-dist --no-progress --no-interaction --dev --optimize-autoloader'
+  keep_releases: 4
 
 hosts:
     82.146.37.186:
@@ -16,4 +17,4 @@ tasks:
 
 after:
   deploy:failed: deploy:unlock
-
+  deploy:cache:clear: database:migrate
