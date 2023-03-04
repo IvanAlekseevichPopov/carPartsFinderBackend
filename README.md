@@ -12,8 +12,10 @@ admin panel to download valid images to internal storage by click
 
 
 
+add deploy configuration to new server
 
-add simple images crawler
+
+
 image resize and change type to lightest(PNG?) right after upload
 add test provider for image storing
 add flag for moderation to parts and images

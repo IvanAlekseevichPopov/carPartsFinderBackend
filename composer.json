@@ -55,6 +55,7 @@
     },
     "require-dev": {
         "dbrekelmans/bdi": "^1.0",
+        "deployer/deployer": "^7.2",
         "friendsofphp/php-cs-fixer": "^3.13",
         "hautelook/alice-bundle": "^2.11",
         "nelmio/alice": "^3.12",
