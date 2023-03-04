@@ -5,9 +5,9 @@ config:
   repository: 'git@github.com:IvanAlekseevichPopov/carPartsFinderBackend.git'
 
 hosts:
-  :
-    remote_user: deployer
-    deploy_path: '~/html'
+    82.146.37.186:
+      remote_user: root
+      deploy_path: '/var/www/html'
 
 tasks:
   build:

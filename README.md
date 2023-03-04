@@ -9,6 +9,10 @@ TODO
 
 
 
+add deploy configuration to new server
+
+
+
 image resize and change type to lightest(PNG?) right after upload
 add test provider for image storing
 add flag for moderation to parts and images
