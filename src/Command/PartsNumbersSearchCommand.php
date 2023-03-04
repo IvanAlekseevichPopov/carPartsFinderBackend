@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException;
+use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -33,7 +34,7 @@ class PartsNumbersSearchCommand extends Command
     private CarModelRepository $carModelRepository;
     private PartNameRepository $partNameRepository;
     private PartRepository $partRepository;
-    private FilesystemAdapter $cache;
+    private DoctrineDbalAdapter $cache;
 
     private SymfonyStyle $io;
     private Client $client;
@@ -45,7 +46,7 @@ class PartsNumbersSearchCommand extends Command
         PartNameRepository $partNameRepository,
         PartRepository $partRepository,
         Client $client,
-        FilesystemAdapter $cache,
+        DoctrineDbalAdapter $cache,
         string $name = null
     ) {
         parent::__construct($name);

@@ -37,3 +37,7 @@ services:
     GuzzleHttp\Client:
         factory: ['App\Service\Factory\ParserClientFactory', 'create']
         arguments: ['%env(SOURCE_API_BASE_URL)%', '%env(SOURCE_SITE_BASE_URL)%']
+
+    Symfony\Component\Cache\Adapter\DoctrineDbalAdapter:
+        arguments:
+            $connOrDsn: '@doctrine.dbal.default_connection'
