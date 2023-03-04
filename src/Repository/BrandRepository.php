@@ -6,6 +6,8 @@ namespace App\Repository;
 
 use App\Entity\Brand;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,5 +33,19 @@ class BrandRepository extends ServiceEntityRepository
             ->setParameter('alreadyParsed', false)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function getCount(): int
+    {
+        $qb = $this->createQueryBuilder('brand');
+
+        return (int) $qb
+            ->select($qb->expr()->count('brand.id'))
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }
