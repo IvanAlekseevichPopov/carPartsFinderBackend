@@ -7,7 +7,7 @@ config:
 
 hosts:
     82.146.37.186:
-      remote_user: root
+      remote_user: www-data
       deploy_path: '/var/www/html'
 
 tasks:

@@ -9,6 +9,8 @@ services:
       - .:/var/www/html
       - ~/.ssh:/var/www/.ssh:rw
       - trash:/var/www/
+    environment:
+      - APP_ENV=dev
     expose:
       - "9000"
     entrypoint: "./docker/dev/php/entrypoint.sh"
