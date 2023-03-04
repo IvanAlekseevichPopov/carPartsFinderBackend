@@ -2,7 +2,8 @@ import:
   - recipe/symfony.php
 
 config:
-  repository: 'git@github.com:IvanAlekseevichPopov/carPartsFinderBackend.git'
+  repository: 'https://github.com/IvanAlekseevichPopov/carPartsFinderBackend.git'
+  git_tty: true
 
 hosts:
     82.146.37.186:
@@ -15,3 +16,4 @@ tasks:
 
 after:
   deploy:failed: deploy:unlock
+
