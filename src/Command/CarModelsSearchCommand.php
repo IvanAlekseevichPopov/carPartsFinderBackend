@@ -2,24 +2,16 @@
 
 namespace App\Command;
 
-use App\Entity\Brand;
 use App\Entity\CarModel;
-use App\Entity\Part;
-use App\Entity\PartName;
 use App\Repository\BrandRepository;
 use App\Repository\CarModelRepository;
-use App\Repository\PartNameRepository;
-use App\Repository\PartRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Exception\ServerException;
-use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -32,66 +24,92 @@ class CarModelsSearchCommand extends Command
 {
     private EntityManagerInterface $entityManager;
     private BrandRepository $brandRepository;
-
-    private SymfonyStyle $io;
     private Client $client;
+    private CacheItemPoolInterface $cache;
+    private CarModelRepository $carModelRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        BrandRepository $manufacturerRepository,
-        Client $client,
-        string $name = null
-    ) {
+        BrandRepository        $brandRepository,
+        CarModelRepository     $carModelRepository,
+        Client                 $client,
+        CacheItemPoolInterface $dbCache,
+        string                 $name = null
+    )
+    {
         parent::__construct($name);
 
         $this->entityManager = $entityManager;
-        $this->brandRepository = $manufacturerRepository;
+        $this->brandRepository = $brandRepository;
         $this->client = $client;
+        $this->cache = $dbCache;
+        $this->carModelRepository = $carModelRepository;
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'part numbers to search')//            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
-    }
-
+    /**
+     * @throws GuzzleException
+     * @throws \Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->io = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
 
-        $brands = $this->brandRepository->findAllToParseModels();
+        $brands = $this->brandRepository->findAll();
+        if (count($brands) === 0) {
+            $io->writeln('All car models are parsed');
+            return Command::SUCCESS;
+        }
 
-        $this->io->writeln('Start parsing car models');
-        $this->io->progressStart(count($brands));
+        $io->writeln('Start parsing car models');
+        $io->progressStart(count($brands));
         foreach ($brands as $brand) {
+            $isModelsOfBrandParsed = $this->cache->getItem("brand_{$brand->getExternalId()}_models_parsed");
+            if ($isModelsOfBrandParsed->isHit()) {
+                $io->progressAdvance();
+                $io->writeln(" | {$brand->getName()} already parsed");
+                continue;
+            }
             $res = $this->client->get("/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models");
             $modelsResponse = json_decode($res->getBody()->getContents(), true);
 
             foreach ($modelsResponse['models'] as $rawModelData) {
+                if ($this->carModelRepository->findOneBy(['externalId' => $rawModelData['id']])) {
+                    $io->writeln("Model {$rawModelData['name']} already exist in db");
+                    continue;
+                }
                 $carModel = new CarModel($brand, $rawModelData['name'], $rawModelData['id']);
                 if (!empty($rawModelData['yearFrom'])) {
-                    $carModel->setProductionStart(DateTimeImmutable::createFromFormat('Ymd', $rawModelData['yearFrom'].'01'));
+                    $carModel->setProductionStart(DateTimeImmutable::createFromFormat('Ymd', $rawModelData['yearFrom'] . '01'));
                 }
                 if (!empty($rawModelData['yearTo'])) {
-                    $carModel->setProductionFinish(DateTimeImmutable::createFromFormat('Ymd', $rawModelData['yearTo'].'01'));
+                    $carModel->setProductionFinish(DateTimeImmutable::createFromFormat('Ymd', $rawModelData['yearTo'] . '01'));
                 }
                 $this->entityManager->persist($carModel);
             }
 
-            $brand->setChildrenModelsParsed(true);
+            $isModelsOfBrandParsed->set(true);
+            $this->cache->save($isModelsOfBrandParsed);
+
             $this->entityManager->flush();
-            $this->io->progressAdvance();
-            $this->io->writeln(" | {$brand->getName()} filled: ".count($modelsResponse['models']));
+            $io->progressAdvance();
+            $io->writeln(" | {$brand->getName()} filled: " . count($modelsResponse['models']));
 
-            $time = random_int(1, 4);
-            $this->io->writeln("Waiting {$time} seconds");
-            sleep($time);
+            self::randomWait($io);
         }
-
-        $this->io->progressFinish();
-
+        $io->progressFinish();
 
         return Command::SUCCESS;
+    }
+
+
+    /**
+     * @param SymfonyStyle $io
+     * @throws \Exception
+     */
+    protected static function randomWait(SymfonyStyle $io): void
+    {
+        $time = random_int(1, 4);
+        $io->writeln("Waiting {$time} seconds");
+        sleep($time);
     }
 }

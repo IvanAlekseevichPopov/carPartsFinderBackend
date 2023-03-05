@@ -22,20 +22,6 @@ class BrandRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Brand[]
-     */
-    public function findAllToParseModels(): array
-    {
-        $qb = $this->createQueryBuilder('brand');
-
-        return $qb
-            ->where($qb->expr()->eq('brand.childrenModelsParsed', ':alreadyParsed'))
-            ->setParameter('alreadyParsed', false)
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
      * @throws NonUniqueResultException
      * @throws NoResultException
      */
@@ -47,5 +33,46 @@ class BrandRepository extends ServiceEntityRepository
             ->select($qb->expr()->count('brand.id'))
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function findWithSimilarName(string $brandName): ?Brand
+    {
+        $qb = $this->createQueryBuilder('brand');
+
+        $brands = $qb
+            ->where($qb->expr()->like( $qb->expr()->lower('brand.name'), ':name'))
+            ->setParameter('name', "%" . mb_strtolower($brandName) . "%")
+            ->getQuery()
+            ->getResult();
+
+        if(count($brands) === 0) {
+            return null;
+        }
+        if(count($brands) === 1) {
+            return $brands[0];
+        }
+
+        $qb = $this->createQueryBuilder('brand');
+
+        return $qb
+            ->where($qb->expr()->eq( $qb->expr()->lower('brand.name'), ':name'))
+            ->setParameter('name', mb_strtolower($brandName))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @return Brand[]
+     */
+    public function findAllToParseParts(): array
+    {
+        $qb = $this->createQueryBuilder('brand');
+
+        return $qb
+            ->where($qb->expr()->eq('brand.childrenModelsParsed', ':alreadyParsed'))
+            ->setParameter('alreadyParsed', false)
+            ->getQuery()
+            ->getResult();
     }
 }

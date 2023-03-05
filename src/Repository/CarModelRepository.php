@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Brand;
 use App\Entity\CarModel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -22,16 +23,16 @@ class CarModelRepository extends ServiceEntityRepository
     /**
      * @return CarModel[]
      */
-    public function findAllToParsePartsNumbers(): array
+    public function findAllToParseByBrand(Brand $brand): array
     {
         $qb = $this->createQueryBuilder('cm');
 
         return $qb
+            ->join('cm.brand', 'b')
             ->where($qb->expr()->eq('cm.childrenPartsParsed', ':alreadyParsed'))
-            ->andWhere($qb->expr()->eq('cm.id', ':id'))
+            ->andWhere($qb->expr()->eq('b.id', ':brand'))
             ->setParameter('alreadyParsed', false)
-            ->setParameter('id', 2329)
-            ->setMaxResults(10)
+            ->setParameter('brand', $brand)
             ->getQuery()
             ->getResult();
     }

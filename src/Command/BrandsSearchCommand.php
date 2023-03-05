@@ -36,7 +36,7 @@ class BrandsSearchCommand extends Command
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        BrandRepository        $manufacturerRepository,
+        BrandRepository        $brandRepository,
         Client                 $client,
         string                 $name = null
     )
@@ -44,10 +44,15 @@ class BrandsSearchCommand extends Command
         parent::__construct($name);
 
         $this->entityManager = $entityManager;
-        $this->brandRepository = $manufacturerRepository;
+        $this->brandRepository = $brandRepository;
         $this->client = $client;
     }
 
+    /**
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws GuzzleException
+     * @throws \Doctrine\ORM\NoResultException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
