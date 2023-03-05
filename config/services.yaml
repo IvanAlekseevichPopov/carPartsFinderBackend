@@ -42,6 +42,7 @@ services:
     Symfony\Component\Cache\Adapter\DoctrineDbalAdapter:
         arguments:
             $connOrDsn: '@doctrine.dbal.default_connection'
+            $namespace: !php/const App\Service\CacheNamespaces::PARSER_CACHE
 
     Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore:
         $connOrUrl: '@doctrine.dbal.default_connection'
