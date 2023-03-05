@@ -1,8 +1,8 @@
-name: Symfony
+name: Static check
 
 on:
   push:
-    branches: [ "*" ]
+    branches: [ "feature/*", "dev" ]
 
 permissions:
   contents: read
