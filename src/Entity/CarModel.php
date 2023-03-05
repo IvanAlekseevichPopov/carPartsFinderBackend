@@ -20,7 +20,7 @@ class CarModel
     private ?int $id;
 
     #[ORM\Column]
-    protected string $name; // todo trasnlation
+    protected string $name; // todo translation
 
     #[ORM\ManyToOne(targetEntity: Brand::class)]
     protected Brand $brand;
