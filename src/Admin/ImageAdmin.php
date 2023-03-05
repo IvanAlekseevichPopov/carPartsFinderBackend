@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Admin;
 
-use App\Entity\File\Image;
 use App\Entity\File\PartImage;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
@@ -38,7 +37,7 @@ class ImageAdmin extends AbstractAdmin
      */
     public function preRemove(object $object): void
     {
-        if ($object instanceof Image) {
+        if ($object instanceof PartImage) {
             $this->operator->delete($object->getStorageFilePath());
         }
     }

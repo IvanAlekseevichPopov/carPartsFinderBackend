@@ -66,8 +66,7 @@ class PartDataMapper implements DataMapperInterface
         }
 
         foreach ($uploadedImages as $uploadedFile) {
-            $image = new PartImage($user, $viewData);
-            $image->setFile($uploadedFile);
+            $image = new PartImage($user, $viewData, md5_file($uploadedFile->getRealPath()));
 
             // TODO async with message bus. Problem with delition uploadedFile from /tmp
             $this->operator->write($image->getStorageFilePath(), $uploadedFile->getContent());

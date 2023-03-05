@@ -13,6 +13,11 @@ RUN apt-get update && apt-get install -y \
     zip \
     zlib1g-dev
 
+#panther support
+#RUN apt-get install -y \
+#    chromium \
+#    chromium-driver
+
 RUN fc-cache -f -v
 
 RUN docker-php-ext-install \
@@ -39,16 +44,6 @@ RUN docker-php-ext-install \
 #RUN pecl install xdebug; \
 #    docker-php-ext-enable xdebug
 
-#ENV COMPOSER_ALLOW_SUPERUSER 1
-COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
-
-RUN usermod -s /bin/bash www-data; \
-    touch /var/www/.bash_history; \
-    chmod 777 /var/www/.bash_history
-
-RUN chown -R www-data:www-data /usr/local/etc/php/; \
-    chmod -R 775 /usr/local/etc/php/
-
 ENV PROMPT_COMMAND="history -a"
 ENV HISTTIMEFORMAT="%h %d %H:%M:%S "
 ENV HISTFILESIZE=20000
@@ -56,5 +51,13 @@ ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
-#COPY ./symfony.ini /usr/local/etc/php/conf.d
-#COPY ./symfony.pool.conf /usr/local/etc/php-fpm.d/
+#ENV PANTHER_NO_SANDBOX=1
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_MEMORY_LIMIT=-1
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+#RUN composer global require dbrekelmans/bdi --prefer-dist --no-progress --no-suggest --optimize-autoloader --no-interaction \
+#    && php /root/.config/composer/vendor/bin/bdi detect drivers
+
+RUN chown -R www-data:www-data /usr/local/etc/php/; \
+    chmod -R 775 /usr/local/etc/php/

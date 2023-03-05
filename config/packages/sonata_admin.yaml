@@ -8,6 +8,7 @@ sonata_block:
             contexts: [admin]
 
 sonata_admin:
+    default_controller: 'App\Admin\Controller'
     title: 'Sonata Admin'
     assets:
         extra_stylesheets:
@@ -19,6 +20,10 @@ sonata_admin:
             - { type: sonata.admin.block.admin_list, position: left }
 
 services:
+    App\Admin\SonataController:
+        autowire: true
+        autoconfigure: true
+
     admin.part:
         class: App\Admin\PartAdmin
         tags:

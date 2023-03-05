@@ -4,25 +4,29 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Repository\PartNameRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table
- * @ORM\Entity
- */
+#[ORM\Table(
+    indexes: [
+        new ORM\Index(columns: ['name']),
+    ]
+)]
+#[ORM\Entity(repositoryClass: PartNameRepository::class)]
 class PartName
 {
-    /**
-     * @ORM\Column(type="integer", options={"unsigned": true})
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $id;
 
-    /**
-     * @ORM\Column
-     */
-    protected string $name = ''; // todo trasnlation
+    #[ORM\Column]
+    protected string $name; // todo trasnlation
+
+    public function __construct(string $defaultLocaleName)
+    {
+        $this->name = $defaultLocaleName;
+    }
 
     public function getName(): string
     {
