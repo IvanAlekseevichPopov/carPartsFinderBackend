@@ -71,37 +71,11 @@ class PartsNumbersSearchCommand extends Command
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $this->parseBrands();
         $this->parseCarModels();
 
-//        $this->parsePartsNumbers();
+        $this->parsePartsNumbers();
 
         return Command::SUCCESS;
-    }
-
-    private function parseBrands()
-    {
-        $this->io->title('Start parsing brands');
-        $client = new Client();
-        $res = $client->request('GET', 'https://tecdoc.autodoc.ru/api/catalogs/tecdoc/brands');
-        $arr = json_decode($res->getBody()->getContents(), true);
-
-        $this->io->progressStart(count($arr));
-        if(count($arr['brands']) <= $this->brandRepository->getCount()) {
-            $this->io->success('Brands already parsed');
-            return;
-        }
-        foreach ($arr['brands'] as $item) {
-            $brand = new Brand($item['name'], $item['id']);
-            $this->entityManager->persist($brand);
-            $this->io->progressAdvance();
-        }
-        $this->io->progressFinish();
-        $this->io->title('Saving brands');
-        $this->entityManager->flush();
-        $this->io->success('Brands saved');
-
-        $this->io->success('Brands parsed');
     }
 
     /**
