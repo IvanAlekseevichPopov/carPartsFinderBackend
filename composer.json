@@ -31,6 +31,7 @@
         "symfony/framework-bundle": "6.1.*",
         "symfony/http-client": "6.1.*",
         "symfony/intl": "6.1.*",
+        "symfony/lock": "6.1.*",
         "symfony/mailer": "6.1.*",
         "symfony/mime": "6.1.*",
         "symfony/monolog-bundle": "^3.0",
@@ -55,7 +56,8 @@
     },
     "require-dev": {
         "dbrekelmans/bdi": "^1.0",
-        "friendsofphp/php-cs-fixer": "^3.13",
+        "deployer/deployer": "^7.2",
+        "friendsofphp/php-cs-fixer": "^3.14",
         "hautelook/alice-bundle": "^2.11",
         "nelmio/alice": "^3.12",
         "phpunit/phpunit": "^9.5",

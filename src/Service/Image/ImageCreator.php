@@ -24,8 +24,8 @@ class ImageCreator
     ];
     public const MIN_FILE_SIZE = 10240; // 10kb
 
-    private DataStorageOperator $dataStorage;
-    private FilesystemOperator $filesystemOperator;
+    private DataStorageOperator $dataStorageOperator;
+    private FilesystemOperator $fileSystemOperator;
     private ClientInterface $imageDownloader;
     private string $cacheDir;
 
@@ -35,8 +35,8 @@ class ImageCreator
         DownloadClientInterface $imageDownloader,
         string $cacheDir
     ) {
-        $this->dataStorage = $dataStorage;
-        $this->filesystemOperator = $operator;
+        $this->dataStorageOperator = $dataStorage;
+        $this->fileSystemOperator = $operator;
         $this->imageDownloader = $imageDownloader;
         $this->cacheDir = $cacheDir;
     }
@@ -46,12 +46,12 @@ class ImageCreator
         // TODO check that file was not uploaded before
         $file = $this->downloadFile($imageUrl);
 
-        $entity = $this->dataStorage->write($part, $uploadedBy, $file);
+        $entity = $this->dataStorageOperator->write($part, $uploadedBy, $file);
 
         try {
-            $this->filesystemOperator->write($entity->getStorageFilePath(), $file->getContent());
+            $this->fileSystemOperator->write($entity->getStorageFilePath(), $file->getContent());
         } catch (\Throwable $e) {
-            $this->dataStorage->delete($entity);
+            $this->dataStorageOperator->delete($entity);
             throw $e;
         }
 

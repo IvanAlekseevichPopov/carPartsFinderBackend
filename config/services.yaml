@@ -11,7 +11,7 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
-#            $projectDir: '%kernel.project_dir%'
+            $dbCache: '@Symfony\Component\Cache\Adapter\DoctrineDbalAdapter'
             $cacheDir: '%kernel.cache_dir%'
 
     # makes classes in src/ available to be used as services
@@ -26,13 +26,10 @@ services:
             - '../src/Model/'
             - '../src/Service/Factory/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    Symfony\Component\Cache\Adapter\FilesystemAdapter:
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
         arguments:
-            - 'cache.app'
-            - 0
-            - '%kernel.project_dir%/var/storage'
+            - '%env(DATABASE_URL)%'
+            - { db_table: 'session'}
 
     GuzzleHttp\ClientInterface:
         factory: ['App\Service\Guzzle\ParserClientFactory', 'create']
@@ -40,3 +37,21 @@ services:
 
     App\Service\Guzzle\DownloadClientInterface:
         class: App\Service\Guzzle\DownloadClient
+
+    #see $dbCache
+    Symfony\Component\Cache\Adapter\DoctrineDbalAdapter:
+        arguments:
+            $connOrDsn: '@doctrine.dbal.default_connection'
+
+    Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore:
+        $connOrUrl: '@doctrine.dbal.default_connection'
+
+    Symfony\Component\Lock\LockFactory:
+        arguments:
+            $store: '@Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore'
+
+#    Symfony\Component\Cache\Adapter\FilesystemAdapter:
+#        arguments:
+#            - 'cache.app'
+#            - 0
+#            - '%kernel.project_dir%/var/storage'

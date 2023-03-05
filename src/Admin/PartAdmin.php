@@ -17,7 +17,6 @@ use Sonata\DoctrineORMAdminBundle\Filter\CallbackFilter;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Routing\RouterInterface;
@@ -123,8 +122,8 @@ class PartAdmin extends AbstractAdmin
             return false;
         }
 
-        if ($data->getValue() === true) {
-            $qb->andWhere($qb->expr()->isNotNull($alias . '.' . $field));
+        if (true === $data->getValue()) {
+            $qb->andWhere($qb->expr()->isNotNull($alias.'.'.$field));
         }
 
         return true;

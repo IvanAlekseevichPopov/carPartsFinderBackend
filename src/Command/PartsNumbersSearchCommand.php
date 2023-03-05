@@ -10,18 +10,18 @@ use App\Repository\BrandRepository;
 use App\Repository\CarModelRepository;
 use App\Repository\PartNameRepository;
 use App\Repository\PartRepository;
+use App\Service\Locks;
 use Doctrine\ORM\EntityManagerInterface;
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Lock\LockFactory;
 
 #[AsCommand(
     name: 'app:parts:find',
@@ -34,144 +34,125 @@ class PartsNumbersSearchCommand extends Command
     private CarModelRepository $carModelRepository;
     private PartNameRepository $partNameRepository;
     private PartRepository $partRepository;
-    private FilesystemAdapter $cache;
     private ClientInterface $client;
+    private CacheItemPoolInterface $cache;
+    private LockFactory $lockFactory;
 
     private SymfonyStyle $io;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        BrandRepository $manufacturerRepository,
+        BrandRepository $brandRepository,
         CarModelRepository $carModelRepository,
         PartNameRepository $partNameRepository,
         PartRepository $partRepository,
         ClientInterface $parserClient,
-        FilesystemAdapter $cache,
+        CacheItemPoolInterface $dbCache,
+        LockFactory $lockFactory,
         string $name = null
     ) {
         parent::__construct($name);
 
         $this->entityManager = $entityManager;
-        $this->brandRepository = $manufacturerRepository;
+        $this->brandRepository = $brandRepository;
         $this->carModelRepository = $carModelRepository;
         $this->partNameRepository = $partNameRepository;
         $this->partRepository = $partRepository;
-        $this->cache = $cache;
         $this->client = $parserClient;
+        $this->cache = $dbCache;
+        $this->lockFactory = $lockFactory;
     }
 
     protected function configure(): void
     {
         $this
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'part numbers to search')//            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
+            ->addArgument('brand', InputArgument::OPTIONAL, 'Which brand to parse. Use brand name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
 
-//        $this->parseBrands();
-//        $this->parseCarModels();
+        $brand = $this->getBrand($input);
+        if ($brand) {
+            $this->io->title("Searching parts for single brand {$brand->getName()}");
+            $models = $this->carModelRepository->findAllToParseByBrand($brand);
 
-        $this->parsePartsNumbers();
+            $this->processModels($models);
+        } else {
+            $brands = $this->brandRepository->findAllToParseParts();
+            $this->io->title('Searching parts for all brands: '.count($brands));
+
+            foreach ($brands as $brand) {
+                $this->io->writeln("Searching parts for brand {$brand->getName()}");
+
+                $models = $this->carModelRepository->findAllToParseByBrand($brand);
+
+                $this->processModels($models);
+
+                $this->io->writeln("Done searching parts for brand {$brand->getName()}. Clearing entity manager");
+                $this->entityManager->clear();
+                gc_collect_cycles();
+            }
+        }
 
         return Command::SUCCESS;
     }
 
-    private function parseBrands()
+    protected function processModels(array $models)
     {
-        $this->io->title('Parsing brands');
-        $client = new Client();
-        $res = $client->request('GET', 'https://tecdoc.autodoc.ru/api/catalogs/tecdoc/brands');
-        $arr = json_decode($res->getBody()->getContents(), true);
-
-        $this->io->progressStart(count($arr));
-        foreach ($arr['brands'] as $item) {
-            $brand = new Brand($item['name'], $item['id']);
-            $this->entityManager->persist($brand);
-            $this->io->progressAdvance();
-        }
-        $this->io->progressFinish();
-        $this->io->title('Saving brands');
-        $this->entityManager->flush();
-        $this->io->success('Brands saved');
-
-        $this->io->success('Brands parsed');
-    }
-
-    /**
-     * @throws GuzzleException
-     * @throws \Exception
-     */
-    private function parseCarModels()
-    {
-        $brands = $this->brandRepository->findAllToParseModels();
-
-        $this->io->writeln('Start parsing car models');
-        $this->io->progressStart(count($brands));
-        foreach ($brands as $brand) {
-            $res = $this->client->get("/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models");
-            $modelsResponse = json_decode($res->getBody()->getContents(), true);
-
-            foreach ($modelsResponse['models'] as $rawModelData) {
-                $carModel = new CarModel($brand, $rawModelData['name'], $rawModelData['id']);
-                if (!empty($rawModelData['yearFrom'])) {
-                    $carModel->setProductionStart(\DateTimeImmutable::createFromFormat('Ymd', $rawModelData['yearFrom'].'01'));
-                }
-                if (!empty($rawModelData['yearTo'])) {
-                    $carModel->setProductionFinish(\DateTimeImmutable::createFromFormat('Ymd', $rawModelData['yearTo'].'01'));
-                }
-                $this->entityManager->persist($carModel);
-            }
-
-            $brand->setChildrenModelsParsed(true);
-            $this->entityManager->flush();
-            $this->io->progressAdvance();
-            $this->io->writeln(" | {$brand->getName()} filled: ".count($modelsResponse['models']));
-
-            $time = random_int(1, 4);
-            $this->io->writeln("Waiting {$time} seconds");
-            sleep($time);
-        }
-
-        $this->io->progressFinish();
-    }
-
-    private function parsePartsNumbers()
-    {
-        $models = $this->carModelRepository->findAllToParsePartsNumbers();
         $this->io->writeln('Start parsing car models');
         $this->io->progressStart(count($models));
         foreach ($models as $model) {
-            $brand = $model->getBrand();
-            $res = $this->client->get("/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models/{$model->getExternalId()}/modifications");
-            $modificationsResponse = json_decode($res->getBody()->getContents(), true);
-
-            foreach ($modificationsResponse['modifications'] as $rawModificationData) {
-                $alreadyProcessed = $this->cache->getItem("modification_{$rawModificationData['id']}");
-                if ($alreadyProcessed->isHit()) {
-                    dump("Modification {$rawModificationData['id']} already processed");
-                    continue;
-                }
-                $nodesRes = $this->client->get("/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models/{$model->getExternalId()}/modifications/{$rawModificationData['id']}/nodes");
-
-                $nodesResponse = json_decode($nodesRes->getBody()->getContents(), true);
-                foreach ($nodesResponse['nodes'] as $rawNodeData) {
-                    $this->processNode($rawNodeData, $rawModificationData['id'], $model);
-                }
-                $alreadyProcessed->set(true);
-                $this->cache->save($alreadyProcessed);
+            $lock = $this->lockFactory->createLock(Locks::PARSING_PARTS_MODEL.$model->getId());
+            if (false === $lock->acquire()) {
+                $this->io->writeln("Lock is already acquired. Skipping model {$model->getName()}");
+                continue;
             }
-            $model->setModifications($modificationsResponse['modifications']);
-            $model->setChildrenPartsParsed(true);
-            $this->entityManager->flush();
-            $this->entityManager->clear();
+            try {
+                $this->processOneModel($model);
+            } catch (\Throwable $e) {
+                $lock->release();
+                throw $e;
+            }
         }
+    }
+
+    private function processOneModel(CarModel $model)
+    {
+        $brand = $model->getBrand();
+        $res = $this->client->get("/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models/{$model->getExternalId()}/modifications");
+        $modificationsResponse = json_decode($res->getBody()->getContents(), true);
+
+        foreach ($modificationsResponse['modifications'] as $rawModificationData) {
+            $alreadyProcessed = $this->cache->getItem("modification_{$rawModificationData['id']}");
+            if ($alreadyProcessed->isHit() && true === $alreadyProcessed->get()) {
+                dump("Modification {$rawModificationData['id']} already processed");
+                continue;
+            }
+            $nodesRes = $this->client->get("/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models/{$model->getExternalId()}/modifications/{$rawModificationData['id']}/nodes");
+
+            $nodesResponse = json_decode($nodesRes->getBody()->getContents(), true);
+            foreach ($nodesResponse['nodes'] as $rawNodeData) {
+                $this->processNode($rawNodeData, $rawModificationData['id'], $model);
+            }
+            $alreadyProcessed->set(true);
+            $this->cache->save($alreadyProcessed);
+        }
+        $model->setModifications($modificationsResponse['modifications']);
+        $model->setChildrenPartsParsed(true);
+        $this->entityManager->flush();
+        $this->entityManager->clear();
     }
 
     private function processNode(array $rawNodeData, int $modificationId, CarModel $model)
     {
+        $lock = $this->lockFactory->createLock(Locks::PARSING_PARTS_NODE.$rawNodeData['id'].'_'.$modificationId);
+        if (false === $lock->acquire()) {
+            $this->io->writeln("Lock is already acquired. Skipping node {$rawNodeData['id']}");
+
+            return;
+        }
         foreach ($rawNodeData['children'] as $rawNodeData) {
             $this->processNode($rawNodeData, $modificationId, $model);
         }
@@ -183,7 +164,6 @@ class PartsNumbersSearchCommand extends Command
 
             return;
         }
-
         $brand = $model->getBrand();
         try {
             $sparePartsRes = $this->client->get("/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models/{$model->getExternalId()}/modifications/{$modificationId}/nodes/{$id}/spareparts");
@@ -208,6 +188,7 @@ class PartsNumbersSearchCommand extends Command
 
         $alreadyProcessed->set(true);
         $this->cache->save($alreadyProcessed);
+        $lock->release();
     }
 
     private function findOrCreateBrand(string $brandName, int $autodocBrandId): Brand
@@ -245,5 +226,16 @@ class PartsNumbersSearchCommand extends Command
         $part->addSuitableModel($model);
 
         return $part;
+    }
+
+    protected function getBrand(InputInterface $input): ?Brand
+    {
+        $brandName = $input->getArgument('brand');
+        $brand = null;
+        if ($brandName) {
+            $brand = $this->brandRepository->findWithSimilarName($brandName);
+        }
+
+        return $brand;
     }
 }
