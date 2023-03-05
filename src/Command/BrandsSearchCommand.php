@@ -5,7 +5,6 @@ namespace App\Command;
 use App\Entity\Brand;
 use App\Repository\BrandRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Attribute\AsCommand;
