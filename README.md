@@ -7,8 +7,8 @@ TODO
 +add collection of images to one part
 +add api of collection of images with rating
 +add simple partNumbers crawler
-
-admin panel to download valid images to internal storage by click
++admin panel to download valid images to internal storage by click
++add deploy configuration to new server
 
 
 
