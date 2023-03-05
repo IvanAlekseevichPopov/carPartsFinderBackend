@@ -22,4 +22,4 @@ jobs:
     - name: Code style check
       run: vendor/bin/php-cs-fixer fix --dry-run --diff
     - name: Lint container
-      run: bin/cosole lint:container
+      run: bin/console lint:container -vvv
