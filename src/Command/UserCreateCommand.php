@@ -30,13 +30,13 @@ class UserCreateCommand extends Command
         EntityManagerInterface $entityManager,
         UserRepository $userRepository,
         string $name = null,
-    )
-    {
+    ) {
         parent::__construct($name);
         $this->hasher = $hasher;
         $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;
     }
+
     protected function configure(): void
     {
         $this
@@ -53,12 +53,14 @@ class UserCreateCommand extends Command
         $email = $input->getArgument('email');
         $pass = $input->getArgument('pass');
 
-        if(empty($email) || empty($pass)) {
+        if (empty($email) || empty($pass)) {
             $io->error('Email or password is empty');
+
             return Command::FAILURE;
         }
-        if($this->userRepository->findOneBy(['email' => $email])) {
+        if ($this->userRepository->findOneBy(['email' => $email])) {
             $io->error('User already exists');
+
             return Command::FAILURE;
         }
 

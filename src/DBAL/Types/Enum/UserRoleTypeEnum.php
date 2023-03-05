@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\DBAL\Types\Enum;
 
-use ValueError;
-
 enum UserRoleTypeEnum: string
 {
     case ROLE_USER = 'ROLE_USER';
@@ -14,10 +12,10 @@ enum UserRoleTypeEnum: string
     public static function fromName(string $name): self
     {
         foreach (self::cases() as $role) {
-            if( $name === $role->name ){
+            if ($name === $role->name) {
                 return $role;
             }
         }
-        throw new ValueError("$name is not a valid backing value for enum " . self::class );
+        throw new \ValueError("$name is not a valid backing value for enum ".self::class);
     }
 }
