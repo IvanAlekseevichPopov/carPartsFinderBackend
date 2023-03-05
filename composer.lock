@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c15fcefda1d98743a848f173b3b25f24",
+    "content-hash": "a2a8ad2eb671bcc05b33bac35954153d",
     "packages": [
         {
             "name": "blackfire/php-sdk",
@@ -1278,16 +1278,16 @@
         },
         {
             "name": "doctrine/migrations",
-            "version": "3.5.5",
+            "version": "3.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/migrations.git",
-                "reference": "4b1e2b6ba71d21d0c5be22ed03b6fc954d20b204"
+                "reference": "e542ad8bcd606d7a18d0875babb8a6d963c9c059"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/migrations/zipball/4b1e2b6ba71d21d0c5be22ed03b6fc954d20b204",
-                "reference": "4b1e2b6ba71d21d0c5be22ed03b6fc954d20b204",
+                "url": "https://api.github.com/repos/doctrine/migrations/zipball/e542ad8bcd606d7a18d0875babb8a6d963c9c059",
+                "reference": "e542ad8bcd606d7a18d0875babb8a6d963c9c059",
                 "shasum": ""
             },
             "require": {
@@ -1295,11 +1295,11 @@
                 "doctrine/dbal": "^3.5.1",
                 "doctrine/deprecations": "^0.5.3 || ^1",
                 "doctrine/event-manager": "^1.2 || ^2.0",
-                "friendsofphp/proxy-manager-lts": "^1.0",
-                "php": "^7.4 || ^8.0",
+                "php": "^8.1",
                 "psr/log": "^1.1.3 || ^2 || ^3",
                 "symfony/console": "^4.4.16 || ^5.4 || ^6.0",
-                "symfony/stopwatch": "^4.4 || ^5.4 || ^6.0"
+                "symfony/stopwatch": "^4.4 || ^5.4 || ^6.0",
+                "symfony/var-exporter": "^6.2"
             },
             "conflict": {
                 "doctrine/orm": "<2.12"
@@ -1315,7 +1315,7 @@
                 "phpstan/phpstan-phpunit": "^1.1",
                 "phpstan/phpstan-strict-rules": "^1.1",
                 "phpstan/phpstan-symfony": "^1.1",
-                "phpunit/phpunit": "^9.5",
+                "phpunit/phpunit": "^9.5.24",
                 "symfony/cache": "^4.4 || ^5.4 || ^6.0",
                 "symfony/process": "^4.4 || ^5.4 || ^6.0",
                 "symfony/yaml": "^4.4 || ^5.4 || ^6.0"
@@ -1360,7 +1360,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/migrations/issues",
-                "source": "https://github.com/doctrine/migrations/tree/3.5.5"
+                "source": "https://github.com/doctrine/migrations/tree/3.6.0"
             },
             "funding": [
                 {
@@ -1376,7 +1376,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-01-18T12:44:30+00:00"
+            "time": "2023-02-15T18:49:46+00:00"
         },
         {
             "name": "doctrine/orm",
@@ -7127,6 +7127,83 @@
             "time": "2023-01-01T08:36:55+00:00"
         },
         {
+            "name": "symfony/lock",
+            "version": "v6.1.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/lock.git",
+                "reference": "cbc3366559a568ed56d9e7ed6d8e29a083eebb5b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/lock/zipball/cbc3366559a568ed56d9e7ed6d8e29a083eebb5b",
+                "reference": "cbc3366559a568ed56d9e7ed6d8e29a083eebb5b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "psr/log": "^1|^2|^3"
+            },
+            "conflict": {
+                "doctrine/dbal": "<2.13"
+            },
+            "require-dev": {
+                "doctrine/dbal": "^2.13|^3.0",
+                "predis/predis": "~1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Lock\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jérémy Derussé",
+                    "email": "jeremy@derusse.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Creates and manages locks, a mechanism to provide exclusive access to a shared resource",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "cas",
+                "flock",
+                "locking",
+                "mutex",
+                "redlock",
+                "semaphore"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/lock/tree/v6.1.11"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-01-01T08:36:55+00:00"
+        },
+        {
             "name": "symfony/mailer",
             "version": "v6.1.11",
             "source": {
@@ -10059,16 +10136,16 @@
         },
         {
             "name": "symfony/var-exporter",
-            "version": "v6.1.11",
+            "version": "v6.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-exporter.git",
-                "reference": "d247e6c302964a6f462302e3ab97eb9617c9b583"
+                "reference": "86062dd0103530e151588c8f60f5b85a139f1442"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-exporter/zipball/d247e6c302964a6f462302e3ab97eb9617c9b583",
-                "reference": "d247e6c302964a6f462302e3ab97eb9617c9b583",
+                "url": "https://api.github.com/repos/symfony/var-exporter/zipball/86062dd0103530e151588c8f60f5b85a139f1442",
+                "reference": "86062dd0103530e151588c8f60f5b85a139f1442",
                 "shasum": ""
             },
             "require": {
@@ -10108,10 +10185,12 @@
                 "export",
                 "hydrate",
                 "instantiate",
+                "lazy loading",
+                "proxy",
                 "serialize"
             ],
             "support": {
-                "source": "https://github.com/symfony/var-exporter/tree/v6.1.11"
+                "source": "https://github.com/symfony/var-exporter/tree/v6.2.7"
             },
             "funding": [
                 {
@@ -10127,7 +10206,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-01-13T08:35:02+00:00"
+            "time": "2023-02-24T10:42:00+00:00"
         },
         {
             "name": "symfony/web-link",

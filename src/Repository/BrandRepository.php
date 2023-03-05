@@ -6,6 +6,8 @@ namespace App\Repository;
 
 use App\Entity\Brand;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -20,9 +22,50 @@ class BrandRepository extends ServiceEntityRepository
     }
 
     /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function getCount(): int
+    {
+        $qb = $this->createQueryBuilder('brand');
+
+        return (int) $qb
+            ->select($qb->expr()->count('brand.id'))
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findWithSimilarName(string $brandName): ?Brand
+    {
+        $qb = $this->createQueryBuilder('brand');
+
+        $brands = $qb
+            ->where($qb->expr()->like( $qb->expr()->lower('brand.name'), ':name'))
+            ->setParameter('name', "%" . mb_strtolower($brandName) . "%")
+            ->getQuery()
+            ->getResult();
+
+        if(count($brands) === 0) {
+            return null;
+        }
+        if(count($brands) === 1) {
+            return $brands[0];
+        }
+
+        $qb = $this->createQueryBuilder('brand');
+
+        return $qb
+            ->where($qb->expr()->eq( $qb->expr()->lower('brand.name'), ':name'))
+            ->setParameter('name', mb_strtolower($brandName))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
      * @return Brand[]
      */
-    public function findAllToParseModels(): array
+    public function findAllToParseParts(): array
     {
         $qb = $this->createQueryBuilder('brand');
 
