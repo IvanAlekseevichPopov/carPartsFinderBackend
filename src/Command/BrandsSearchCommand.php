@@ -48,7 +48,7 @@ class BrandsSearchCommand extends Command
 
         $io->title('Start parsing brands');
 
-        $res = $this->client->get('https://tecdoc.autodoc.ru/api/catalogs/tecdoc/brands');
+        $res = $this->client->get('/api/catalogs/tecdoc/brands');
         $arr = json_decode($res->getBody()->getContents(), true);
 
         $io->progressStart(count($arr));

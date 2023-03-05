@@ -95,6 +95,7 @@ class PartAdmin extends AbstractAdmin
             ])
             ->add('partNumber')
             ->add('partName.name')
+            ->add('brand.name')
         ;
     }
 
@@ -105,6 +106,7 @@ class PartAdmin extends AbstractAdmin
             ->add('partNumber')
             ->add('partName.name')
             ->add('brand.name')
+            ->add('suitableForModels')
             ->add('imagesToParse', null, [
                 'template' => 'admin/list_field_images_to_parse.html.twig',
             ])
