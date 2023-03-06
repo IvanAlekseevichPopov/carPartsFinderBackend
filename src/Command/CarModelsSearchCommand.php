@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'app:car:find',
+    name: 'app:cars:find',
     description: 'Command to search car models',
 )]
 class CarModelsSearchCommand extends Command

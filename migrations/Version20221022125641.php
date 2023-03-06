@@ -30,24 +30,23 @@ final class Version20221022125641 extends AbstractMigration
         $this->addSql('DROP TRIGGER IF EXISTS notify_trigger ON messenger_messages;');
         $this->addSql('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON messenger_messages FOR EACH ROW EXECUTE PROCEDURE notify_messenger_messages();');
 
-        //sessions table
+        // sessions table
         $this->addSql('CREATE TABLE session (sess_id VARCHAR(128) NOT NULL PRIMARY KEY,sess_data BYTEA NOT NULL,sess_lifetime INTEGER NOT NULL,sess_time INTEGER NOT NULL);');
         $this->addSql('CREATE INDEX session_sess_lifetime_idx ON session (sess_lifetime);');
 
-        //cache table
+        // cache table
         $this->addSql('CREATE TABLE cache_items( item_id       varchar(255) not null constraint cache_items_pkey primary key, item_data     bytea        not null, item_lifetime integer, item_time     integer      not null);');
-
     }
 
     public function down(Schema $schema): void
     {
-        //drop messages table
+        // drop messages table
         $this->addSql('DROP TABLE messenger_messages');
 
-        //drop sessions table
+        // drop sessions table
         $this->addSql('DROP table session cascade;');
 
-        //drop cache table
+        // drop cache table
         $this->addSql('drop table cache_items cascade;');
     }
 }
