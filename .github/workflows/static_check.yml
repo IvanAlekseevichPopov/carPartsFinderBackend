@@ -1,0 +1,25 @@
+name: Static check
+
+on:
+  push:
+    branches: [ "feature/*", "dev" ]
+
+permissions:
+  contents: read
+
+jobs:
+  static_check:
+    runs-on: ubuntu-latest
+    env:
+      PHP_CS_FIXER_IGNORE_ENV: 1
+    steps:
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+    - uses: actions/checkout@v3
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --dev
+    - name: Code style check
+      run: vendor/bin/php-cs-fixer fix --dry-run --diff
+    - name: Lint container
+      run: bin/console lint:container -vvv
