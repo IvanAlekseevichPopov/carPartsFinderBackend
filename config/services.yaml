@@ -12,6 +12,7 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             $dbCache: '@Symfony\Component\Cache\Adapter\DoctrineDbalAdapter'
+            $cacheDir: '%kernel.cache_dir%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -23,27 +24,24 @@ services:
             - '../src/Kernel.php'
             - '../src/Admin/'
             - '../src/Model/'
+            - '../src/Service/Factory/'
 
     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
         arguments:
             - '%env(DATABASE_URL)%'
             - { db_table: 'session'}
 
-#    Symfony\Component\Cache\Adapter\FilesystemAdapter:
-#        arguments:
-#            - 'cache.app'
-#            - 0
-#            - '%kernel.project_dir%/var/storage'
-
-    GuzzleHttp\Client:
-        factory: ['App\Service\Factory\ParserClientFactory', 'create']
+    GuzzleHttp\ClientInterface:
+        factory: ['App\Service\Guzzle\ParserClientFactory', 'create']
         arguments: ['%env(SOURCE_API_BASE_URL)%', '%env(SOURCE_SITE_BASE_URL)%']
+
+    App\Service\Guzzle\DownloadClientInterface:
+        class: App\Service\Guzzle\DownloadClient
 
     #see $dbCache
     Symfony\Component\Cache\Adapter\DoctrineDbalAdapter:
         arguments:
             $connOrDsn: '@doctrine.dbal.default_connection'
-
 
     Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore:
         $connOrUrl: '@doctrine.dbal.default_connection'
@@ -51,3 +49,9 @@ services:
     Symfony\Component\Lock\LockFactory:
         arguments:
             $store: '@Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore'
+
+#    Symfony\Component\Cache\Adapter\FilesystemAdapter:
+#        arguments:
+#            - 'cache.app'
+#            - 0
+#            - '%kernel.project_dir%/var/storage'

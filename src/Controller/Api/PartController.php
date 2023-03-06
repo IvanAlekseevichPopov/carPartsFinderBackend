@@ -6,6 +6,7 @@ namespace App\Controller\Api;
 
 use App\DBAL\Types\Enum\ViewTypeEnum;
 use App\Entity\File\Image;
+use App\Entity\File\PartImage;
 use App\Entity\Part;
 use App\Form\Query\BaseQueryType;
 use App\Model\Query\BaseQuery;
@@ -76,7 +77,7 @@ class PartController extends AbstractController
     }
 
     #[Route('/api/files/{id}', name: 'api_download_image', methods: ['GET'])]
-    public function getImage(Image $image, FilesystemOperator $operator, LoggerInterface $logger): Response
+    public function getImage(PartImage $image, FilesystemOperator $operator, LoggerInterface $logger): Response
     {
         try {
 //           TODO checksum сравнение и логгирование несовпадений

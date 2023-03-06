@@ -55,9 +55,9 @@
         "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
-        "deployer/deployer": "^7.2",
         "dbrekelmans/bdi": "^1.0",
-        "friendsofphp/php-cs-fixer": "^3.13",
+        "deployer/deployer": "^7.2",
+        "friendsofphp/php-cs-fixer": "^3.14",
         "hautelook/alice-bundle": "^2.11",
         "nelmio/alice": "^3.12",
         "phpunit/phpunit": "^9.5",

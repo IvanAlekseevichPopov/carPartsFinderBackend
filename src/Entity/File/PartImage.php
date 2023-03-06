@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Entity\File;
 
 use App\Entity\Part;
-use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Table]
 #[ORM\Entity]
@@ -17,8 +17,8 @@ class PartImage
     #[ORM\Column(type: 'uuid', unique: true)]
     protected string $id;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    protected User $uploadedBy;
+    #[ORM\ManyToOne(targetEntity: UserInterface::class)]
+    protected UserInterface $uploadedBy;
 
     #[ORM\Column]
     private string $checkSum;
@@ -26,10 +26,10 @@ class PartImage
     #[ORM\ManyToOne(targetEntity: Part::class, inversedBy: 'images')]
     protected Part $part;
 
-    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\Column(type: 'integer', nullable: true, options: ['unsigned' => true])]
     protected ?int $rating = null;
 
-    public function __construct(User $uploadedBy, Part $part, string $checkSum)
+    public function __construct(UserInterface $uploadedBy, Part $part, string $checkSum)
     {
         $this->id = Uuid::uuid7()->toString();
         $this->uploadedBy = $uploadedBy;
@@ -62,7 +62,7 @@ class PartImage
         return '/tmp/'.$this->getId();
     }
 
-    public function getUploadedBy(): User
+    public function getUploadedBy(): UserInterface
     {
         return $this->uploadedBy;
     }

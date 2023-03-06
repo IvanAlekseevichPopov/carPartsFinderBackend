@@ -5,9 +5,8 @@ namespace App\Command;
 use App\Entity\CarModel;
 use App\Repository\BrandRepository;
 use App\Repository\CarModelRepository;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -24,19 +23,18 @@ class CarModelsSearchCommand extends Command
 {
     private EntityManagerInterface $entityManager;
     private BrandRepository $brandRepository;
-    private Client $client;
+    private ClientInterface $client;
     private CacheItemPoolInterface $cache;
     private CarModelRepository $carModelRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        BrandRepository        $brandRepository,
-        CarModelRepository     $carModelRepository,
-        Client                 $client,
+        BrandRepository $brandRepository,
+        CarModelRepository $carModelRepository,
+        ClientInterface $client,
         CacheItemPoolInterface $dbCache,
-        string                 $name = null
-    )
-    {
+        string $name = null
+    ) {
         parent::__construct($name);
 
         $this->entityManager = $entityManager;
@@ -55,8 +53,9 @@ class CarModelsSearchCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $brands = $this->brandRepository->findAll();
-        if (count($brands) === 0) {
+        if (0 === count($brands)) {
             $io->writeln('All car models are parsed');
+
             return Command::SUCCESS;
         }
 
@@ -79,10 +78,10 @@ class CarModelsSearchCommand extends Command
                 }
                 $carModel = new CarModel($brand, $rawModelData['name'], $rawModelData['id']);
                 if (!empty($rawModelData['yearFrom'])) {
-                    $carModel->setProductionStart(DateTimeImmutable::createFromFormat('Ymd', $rawModelData['yearFrom'] . '01'));
+                    $carModel->setProductionStart(\DateTimeImmutable::createFromFormat('Ymd', $rawModelData['yearFrom'].'01'));
                 }
                 if (!empty($rawModelData['yearTo'])) {
-                    $carModel->setProductionFinish(DateTimeImmutable::createFromFormat('Ymd', $rawModelData['yearTo'] . '01'));
+                    $carModel->setProductionFinish(\DateTimeImmutable::createFromFormat('Ymd', $rawModelData['yearTo'].'01'));
                 }
                 $this->entityManager->persist($carModel);
             }
@@ -92,7 +91,7 @@ class CarModelsSearchCommand extends Command
 
             $this->entityManager->flush();
             $io->progressAdvance();
-            $io->writeln(" | {$brand->getName()} filled: " . count($modelsResponse['models']));
+            $io->writeln(" | {$brand->getName()} filled: ".count($modelsResponse['models']));
 
             self::randomWait($io);
         }
@@ -101,9 +100,7 @@ class CarModelsSearchCommand extends Command
         return Command::SUCCESS;
     }
 
-
     /**
-     * @param SymfonyStyle $io
      * @throws \Exception
      */
     protected static function randomWait(SymfonyStyle $io): void

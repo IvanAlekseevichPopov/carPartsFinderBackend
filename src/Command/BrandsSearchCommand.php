@@ -3,22 +3,13 @@
 namespace App\Command;
 
 use App\Entity\Brand;
-use App\Entity\CarModel;
-use App\Entity\Part;
-use App\Entity\PartName;
 use App\Repository\BrandRepository;
-use App\Repository\CarModelRepository;
-use App\Repository\PartNameRepository;
-use App\Repository\PartRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Exception\ServerException;
-use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -32,15 +23,14 @@ class BrandsSearchCommand extends Command
     private EntityManagerInterface $entityManager;
     private BrandRepository $brandRepository;
 
-    private Client $client;
+    private ClientInterface $client;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        BrandRepository        $brandRepository,
-        Client                 $client,
-        string                 $name = null
-    )
-    {
+        BrandRepository $brandRepository,
+        ClientInterface $client,
+        string $name = null
+    ) {
         parent::__construct($name);
 
         $this->entityManager = $entityManager;
@@ -65,6 +55,7 @@ class BrandsSearchCommand extends Command
         $io->progressStart(count($arr));
         if (count($arr['brands']) <= $this->brandRepository->getCount()) {
             $io->success('Brands already parsed');
+
             return Command::SUCCESS;
         }
         foreach ($arr['brands'] as $item) {

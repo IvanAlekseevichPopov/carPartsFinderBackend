@@ -1,0 +1,16 @@
+{% extends '@SonataAdmin/CRUD/base_list_field.html.twig' %}
+
+{%- block field %}
+    {% if value is not null %}
+        {% set uniqueId = object.id | replace({'-': ''}) %}
+        <div id="gallery{{ uniqueId }}">
+            {% for image in value %}
+                <a href="{{ image }}" data-fancybox="gallery{{ uniqueId }}"
+                  {# TODO it's global state usage - remove! Second part in admin.js #}
+                   onclick="window.selectedPart = '{{ object.id }}'">
+                    <img class="list-preview-image" src="{{ image }}"/>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock -%}

@@ -40,22 +40,22 @@ class BrandRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('brand');
 
         $brands = $qb
-            ->where($qb->expr()->like( $qb->expr()->lower('brand.name'), ':name'))
-            ->setParameter('name', "%" . mb_strtolower($brandName) . "%")
+            ->where($qb->expr()->like($qb->expr()->lower('brand.name'), ':name'))
+            ->setParameter('name', '%'.mb_strtolower($brandName).'%')
             ->getQuery()
             ->getResult();
 
-        if(count($brands) === 0) {
+        if (0 === count($brands)) {
             return null;
         }
-        if(count($brands) === 1) {
+        if (1 === count($brands)) {
             return $brands[0];
         }
 
         $qb = $this->createQueryBuilder('brand');
 
         return $qb
-            ->where($qb->expr()->eq( $qb->expr()->lower('brand.name'), ':name'))
+            ->where($qb->expr()->eq($qb->expr()->lower('brand.name'), ':name'))
             ->setParameter('name', mb_strtolower($brandName))
             ->setMaxResults(1)
             ->getQuery()

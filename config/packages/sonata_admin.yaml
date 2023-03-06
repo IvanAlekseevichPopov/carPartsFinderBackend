@@ -8,13 +8,21 @@ sonata_block:
             contexts: [admin]
 
 sonata_admin:
-    default_controller: 'App\Admin\Controller'
+    default_controller: 'App\Admin\SonataController'
     title: 'Sonata Admin'
     assets:
         extra_stylesheets:
             - app/css/admin.css
+            - "https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.css"
+            - "https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"
+            - app/css/loader.css
         extra_javascripts:
             - app/js/admin.js
+            - "https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"
+            - "https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.js"
+            - app/js/loader.js
+            - "https://cdn.jsdelivr.net/npm/sweetalert2@11"
+
     dashboard:
         blocks:
             - { type: sonata.admin.block.admin_list, position: left }

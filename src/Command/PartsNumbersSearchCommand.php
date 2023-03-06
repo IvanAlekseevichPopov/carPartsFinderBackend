@@ -12,7 +12,7 @@ use App\Repository\PartNameRepository;
 use App\Repository\PartRepository;
 use App\Service\Locks;
 use Doctrine\ORM\EntityManagerInterface;
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ServerException;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -22,7 +22,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
-use Throwable;
 
 #[AsCommand(
     name: 'app:parts:find',
@@ -35,24 +34,23 @@ class PartsNumbersSearchCommand extends Command
     private CarModelRepository $carModelRepository;
     private PartNameRepository $partNameRepository;
     private PartRepository $partRepository;
+    private ClientInterface $client;
     private CacheItemPoolInterface $cache;
+    private LockFactory $lockFactory;
 
     private SymfonyStyle $io;
-    private Client $client;
-    private LockFactory $lockFactory;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        BrandRepository        $brandRepository,
-        CarModelRepository     $carModelRepository,
-        PartNameRepository     $partNameRepository,
-        PartRepository         $partRepository,
-        Client                 $client,
+        BrandRepository $brandRepository,
+        CarModelRepository $carModelRepository,
+        PartNameRepository $partNameRepository,
+        PartRepository $partRepository,
+        ClientInterface $parserClient,
         CacheItemPoolInterface $dbCache,
-        LockFactory            $lockFactory,
-        string                 $name = null
-    )
-    {
+        LockFactory $lockFactory,
+        string $name = null
+    ) {
         parent::__construct($name);
 
         $this->entityManager = $entityManager;
@@ -60,8 +58,8 @@ class PartsNumbersSearchCommand extends Command
         $this->carModelRepository = $carModelRepository;
         $this->partNameRepository = $partNameRepository;
         $this->partRepository = $partRepository;
+        $this->client = $parserClient;
         $this->cache = $dbCache;
-        $this->client = $client;
         $this->lockFactory = $lockFactory;
     }
 
@@ -83,7 +81,7 @@ class PartsNumbersSearchCommand extends Command
             $this->processModels($models);
         } else {
             $brands = $this->brandRepository->findAllToParseParts();
-            $this->io->title("Searching parts for all brands: " . count($brands));
+            $this->io->title('Searching parts for all brands: '.count($brands));
 
             foreach ($brands as $brand) {
                 $this->io->writeln("Searching parts for brand {$brand->getName()}");
@@ -106,14 +104,14 @@ class PartsNumbersSearchCommand extends Command
         $this->io->writeln('Start parsing car models');
         $this->io->progressStart(count($models));
         foreach ($models as $model) {
-            $lock = $this->lockFactory->createLock(Locks::PARSING_PARTS_MODEL . $model->getId());
-            if ($lock->acquire() === false) {
+            $lock = $this->lockFactory->createLock(Locks::PARSING_PARTS_MODEL.$model->getId());
+            if (false === $lock->acquire()) {
                 $this->io->writeln("Lock is already acquired. Skipping model {$model->getName()}");
                 continue;
             }
             try {
                 $this->processOneModel($model);
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 $lock->release();
                 throw $e;
             }
@@ -128,7 +126,7 @@ class PartsNumbersSearchCommand extends Command
 
         foreach ($modificationsResponse['modifications'] as $rawModificationData) {
             $alreadyProcessed = $this->cache->getItem("modification_{$rawModificationData['id']}");
-            if ($alreadyProcessed->isHit() && $alreadyProcessed->get() === true) {
+            if ($alreadyProcessed->isHit() && true === $alreadyProcessed->get()) {
                 dump("Modification {$rawModificationData['id']} already processed");
                 continue;
             }
@@ -149,9 +147,10 @@ class PartsNumbersSearchCommand extends Command
 
     private function processNode(array $rawNodeData, int $modificationId, CarModel $model)
     {
-        $lock = $this->lockFactory->createLock(Locks::PARSING_PARTS_NODE . $rawNodeData['id'] . '_' . $modificationId);
-        if ($lock->acquire() === false) {
+        $lock = $this->lockFactory->createLock(Locks::PARSING_PARTS_NODE.$rawNodeData['id'].'_'.$modificationId);
+        if (false === $lock->acquire()) {
             $this->io->writeln("Lock is already acquired. Skipping node {$rawNodeData['id']}");
+
             return;
         }
         foreach ($rawNodeData['children'] as $rawNodeData) {
@@ -181,9 +180,9 @@ class PartsNumbersSearchCommand extends Command
         } catch (ServerException $e) {
             dump($e->getMessage());
 
-            $item = $this->cache->getItem('failed_nodes_' . $brand->getName());
+            $item = $this->cache->getItem('failed_nodes_'.$brand->getName());
             $value = $item->get() ?? [];
-            $value[] = $modificationId . '|' . $id;
+            $value[] = $modificationId.'|'.$id;
             $item->set($value);
         }
 
@@ -236,6 +235,7 @@ class PartsNumbersSearchCommand extends Command
         if ($brandName) {
             $brand = $this->brandRepository->findWithSimilarName($brandName);
         }
+
         return $brand;
     }
 }
