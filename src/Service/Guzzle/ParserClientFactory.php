@@ -62,7 +62,7 @@ class ParserClientFactory
                     'Origin' => $referer,
                     'Referer' => $referer.'/',
                     'Sec-ch-ua' => 'Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"',
-                    'sec-ch-ua-platform' => "Linux",
+                    'sec-ch-ua-platform' => 'Linux',
                     'Sec-ch-ua-mobile' => '?0',
                     'Sec-fetch-dest' => 'empty',
                     'Sec-fetch-mode' => 'cors',
