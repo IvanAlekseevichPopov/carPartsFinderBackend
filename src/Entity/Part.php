@@ -89,4 +89,9 @@ class Part
     {
         return $this->imagesToParse;
     }
+
+    public function getSuitableForModels(): array
+    {
+        return $this->suitableForModels;
+    }
 }

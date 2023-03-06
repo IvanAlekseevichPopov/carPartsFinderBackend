@@ -160,7 +160,7 @@ class PartsNumbersSearchCommand extends Command
         $id = $rawNodeData['id'];
         $alreadyProcessed = $this->cache->getItem("node_{$modificationId}_{$id}");
         if ($alreadyProcessed->isHit()) {
-            dump("Node {$modificationId}_{$id} already processed");
+            $this->io->writeln("Node {$modificationId}_{$id} already processed");
 
             return;
         }
@@ -178,7 +178,7 @@ class PartsNumbersSearchCommand extends Command
                 $this->entityManager->flush();
             }
         } catch (ServerException $e) {
-            dump($e->getMessage());
+            $this->io->writeln($e->getMessage());
 
             $item = $this->cache->getItem('failed_nodes_'.$brand->getName());
             $value = $item->get() ?? [];
