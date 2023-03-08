@@ -32,6 +32,14 @@ services:
         autowire: true
         autoconfigure: true
 
+    admin.brand:
+        class: App\Admin\BrandAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Brand, manager_type: orm, label: Brands }
+#        calls:
+#            - [ setRouter, [ '@router' ] ]
+#            - [ setDataMapper, [ '@App\Form\DataMapper\PartDataMapper' ] ]
+
     admin.part:
         class: App\Admin\PartAdmin
         tags:

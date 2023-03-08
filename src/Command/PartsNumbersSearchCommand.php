@@ -103,7 +103,6 @@ class PartsNumbersSearchCommand extends Command
     protected function processModels(array $models)
     {
         $this->io->writeln('Start parsing car models');
-        $this->io->progressStart(count($models));
         foreach ($models as $model) {
             $lock = $this->lockFactory->createLock(Locks::PARSING_PARTS_MODEL.$model->getId());
             if (false === $lock->acquire()) {
@@ -121,11 +120,16 @@ class PartsNumbersSearchCommand extends Command
 
     private function processOneModel(CarModel $model)
     {
+        $this->io->writeln("Start parsing car model {$model->getName()}");
         $brand = $model->getBrand();
         $res = $this->client->get("/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models/{$model->getExternalId()}/modifications");
         $modificationsResponse = json_decode($res->getBody()->getContents(), true);
 
         foreach ($modificationsResponse['modifications'] as $rawModificationData) {
+            if ('Мотоцикл' === $rawModificationData['constructionType']) {
+                continue;
+            }
+            $this->io->writeln("Start parsing modification {$model->getName()} {$rawModificationData['name']} {$rawModificationData['constructionType']}");
             $alreadyProcessed = $this->cache->getItem("modification_{$rawModificationData['id']}");
             if ($alreadyProcessed->isHit() && true === $alreadyProcessed->get()) {
                 $this->io->writeln("Modification {$rawModificationData['id']} already processed");
@@ -140,11 +144,16 @@ class PartsNumbersSearchCommand extends Command
             }
             $alreadyProcessed->set(true);
             $this->cache->save($alreadyProcessed);
+            $this->io->writeln('Finished modification. Clearing');
+            $this->entityManager->flush();
+            $this->entityManager->clear();
+            gc_collect_cycles();
         }
         $model->setModifications($modificationsResponse['modifications']);
         $model->setChildrenPartsParsed(true);
         $this->entityManager->flush();
-        $this->entityManager->clear();
+
+        $this->io->writeln("Start parsing car model {$model->getName()}");
     }
 
     private function processNode(array $rawNodeData, int $modificationId, CarModel $model)
@@ -162,7 +171,7 @@ class PartsNumbersSearchCommand extends Command
         $id = $rawNodeData['id'];
         $alreadyProcessed = $this->cache->getItem("node_{$modificationId}_{$id}");
         if ($alreadyProcessed->isHit()) {
-            $this->io->writeln("Node {$modificationId}_{$id} already processed");
+//            $this->io->writeln("Node {$modificationId}_{$id} already processed");
 
             return;
         }
@@ -220,6 +229,7 @@ class PartsNumbersSearchCommand extends Command
         $part = $this->partRepository->findOneBy(['partNumber' => $partNumber]);
         if (!$part) {
             $part = new Part($partNumber, $partName, $brand);
+            $this->io->writeln("New part {$part->getPartNumber()}");
             if (!empty($images)) {
                 $part->setImagesToParse($images);
             }

@@ -75,12 +75,11 @@ class PartAdmin extends AbstractAdmin
                 'class' => PartName::class,
                 'choice_label' => 'name',
             ])
-            ->add('manufacturer', EntityType::class, [
+            ->add('brand', EntityType::class, [
                 'class' => Brand::class,
                 'choice_label' => 'name',
             ])
-            ->add('images', FileType::class, $fileFieldOptions)
-        ;
+            ->add('images', FileType::class, $fileFieldOptions);
 
         $form->getFormBuilder()->setDataMapper($this->dataMapper);
     }
@@ -95,8 +94,15 @@ class PartAdmin extends AbstractAdmin
             ])
             ->add('partNumber')
             ->add('partName.name')
-            ->add('brand.name')
-        ;
+            ->add(
+                'brand',
+                null,
+                [
+                    'field_options' => [
+                        'choice_label' => 'name',
+                    ],
+                ],
+            );
     }
 
     protected function configureListFields(ListMapper $list): void
@@ -105,7 +111,13 @@ class PartAdmin extends AbstractAdmin
             ->add('id')
             ->add('partNumber')
             ->add('partName.name')
-            ->add('brand.name')
+            ->add('brand', null, [
+                'associated_property' => 'name',
+                'admin_code' => 'admin.brand',
+                'route' => [
+                    'name' => 'show',
+                ],
+            ])
             ->add('suitableForModels')
             ->add('imagesToParse', null, [
                 'template' => 'admin/list_field_images_to_parse.html.twig',
