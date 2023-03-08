@@ -9,7 +9,7 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class BrandAdmin extends AppAbstractAdmin
+class CarModelAdmin extends AppAbstractAdmin
 {
     protected function configureFormFields(FormMapper $form): void
     {
@@ -21,14 +21,24 @@ class BrandAdmin extends AppAbstractAdmin
                 'disabled' => true,
             ])
             ->add('name')
-            ->add('childrenModelsParsed');
+            ->add('brand')
+            ->add('childrenPartsParsed');
     }
 
     protected function configureDatagridFilters(DatagridMapper $filter): void
     {
         $filter
             ->add('externalId')
-            ->add('name');
+            ->add('name')
+            ->add(
+                'brand',
+                null,
+                [
+                    'field_options' => [
+                        'choice_label' => 'name',
+                    ],
+                ],
+            );
     }
 
     protected function configureListFields(ListMapper $list): void
@@ -37,7 +47,14 @@ class BrandAdmin extends AppAbstractAdmin
             ->add('id')
             ->add('externalId')
             ->add('name')
-            ->add('childrenModelsParsed')
+            ->add('brand', null, [
+                'associated_property' => 'name',
+                'admin_code' => 'admin.brand',
+                'route' => [
+                    'name' => 'edit',
+                ],
+            ])
+            ->add('childrenPartsParsed')
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'edit' => [],

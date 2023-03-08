@@ -1,0 +1,2 @@
+### отдельным запросом достать description(оттуда позже можно извлечь размеры и возможно partName)
+GET https://webapi.autodoc.ru/api/manufacturer/5216/sparepart/95gay27430909l

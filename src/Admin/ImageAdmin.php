@@ -7,7 +7,6 @@ namespace App\Admin;
 use App\Entity\File\PartImage;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
-use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollectionInterface;
@@ -16,7 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraints\Range;
 
-class ImageAdmin extends AbstractAdmin
+class ImageAdmin extends AppAbstractAdmin
 {
     private FilesystemOperator $operator;
 

@@ -7,7 +7,6 @@ namespace App\Admin;
 use App\Entity\Brand;
 use App\Entity\Part;
 use App\Entity\PartName;
-use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Filter\Model\FilterData;
@@ -21,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Routing\RouterInterface;
 
-class PartAdmin extends AbstractAdmin
+class PartAdmin extends AppAbstractAdmin
 {
     private const IMAGES_HTML_CLASS = 'show-images';
 
@@ -56,7 +55,7 @@ class PartAdmin extends AbstractAdmin
             $imagesRawSting = '';
             foreach ($images as $image) {
                 $fullPath = $this->router->generate('api_download_image', ['id' => $image->getId()]);
-                $imagesRawSting .= $fullPath.'|';
+                $imagesRawSting .= $fullPath . '|';
             }
             $fileFieldOptions['help'] = $imagesRawSting;
         }
@@ -115,7 +114,7 @@ class PartAdmin extends AbstractAdmin
                 'associated_property' => 'name',
                 'admin_code' => 'admin.brand',
                 'route' => [
-                    'name' => 'show',
+                    'name' => 'edit',
                 ],
             ])
             ->add('suitableForModels')
@@ -137,7 +136,7 @@ class PartAdmin extends AbstractAdmin
         }
 
         if (true === $data->getValue()) {
-            $qb->andWhere($qb->expr()->isNotNull($alias.'.'.$field));
+            $qb->andWhere($qb->expr()->isNotNull($alias . '.' . $field));
         }
 
         return true;
