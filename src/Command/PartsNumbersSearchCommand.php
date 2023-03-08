@@ -13,6 +13,7 @@ use App\Repository\PartRepository;
 use App\Service\Locks;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -127,9 +128,10 @@ class PartsNumbersSearchCommand extends Command
         foreach ($modificationsResponse['modifications'] as $rawModificationData) {
             $alreadyProcessed = $this->cache->getItem("modification_{$rawModificationData['id']}");
             if ($alreadyProcessed->isHit() && true === $alreadyProcessed->get()) {
-                dump("Modification {$rawModificationData['id']} already processed");
+                $this->io->writeln("Modification {$rawModificationData['id']} already processed");
                 continue;
             }
+            usleep(random_int(10000, 100000));
             $nodesRes = $this->client->get("/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models/{$model->getExternalId()}/modifications/{$rawModificationData['id']}/nodes");
 
             $nodesResponse = json_decode($nodesRes->getBody()->getContents(), true);
@@ -177,12 +179,12 @@ class PartsNumbersSearchCommand extends Command
                 $this->findOrCreatePart($brand, $partName, $model, $rawSparePartData['partNumber'], $rawSparePartData['imageUrls'] ?? null);
                 $this->entityManager->flush();
             }
-        } catch (ServerException $e) {
+        } catch (ServerException|ConnectException $e) {
             $this->io->writeln($e->getMessage());
 
             $item = $this->cache->getItem('failed_nodes_'.$brand->getName());
             $value = $item->get() ?? [];
-            $value[] = $modificationId.'|'.$id;
+            $value[] = "/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models/{$model->getExternalId()}/modifications/{$modificationId}/nodes/{$id}/spareparts";
             $item->set($value);
         }
 
