@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Admin;
@@ -13,4 +14,5 @@ class AppAbstractAdmin extends AbstractAdmin
         $collection->remove('create');
         $collection->remove('delete');
         $collection->remove('show');
-    }}
+    }
+}

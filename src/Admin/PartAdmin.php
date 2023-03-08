@@ -55,7 +55,7 @@ class PartAdmin extends AppAbstractAdmin
             $imagesRawSting = '';
             foreach ($images as $image) {
                 $fullPath = $this->router->generate('api_download_image', ['id' => $image->getId()]);
-                $imagesRawSting .= $fullPath . '|';
+                $imagesRawSting .= $fullPath.'|';
             }
             $fileFieldOptions['help'] = $imagesRawSting;
         }
@@ -136,7 +136,7 @@ class PartAdmin extends AppAbstractAdmin
         }
 
         if (true === $data->getValue()) {
-            $qb->andWhere($qb->expr()->isNotNull($alias . '.' . $field));
+            $qb->andWhere($qb->expr()->isNotNull($alias.'.'.$field));
         }
 
         return true;
