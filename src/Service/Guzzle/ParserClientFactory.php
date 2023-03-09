@@ -8,7 +8,7 @@ use GuzzleHttp\Client;
 
 class ParserClientFactory
 {
-    private const TIMEOUT = 10;
+    private const TIMEOUT = 16;
 
     public static function create(string $baseUrl, string $referer): Client
     {

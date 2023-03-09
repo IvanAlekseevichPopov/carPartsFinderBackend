@@ -32,6 +32,16 @@ services:
         autowire: true
         autoconfigure: true
 
+    admin.brand:
+        class: App\Admin\BrandAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Brand, manager_type: orm, label: Brands }
+
+    admin.car_model:
+        class: App\Admin\CarModelAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\CarModel, manager_type: orm, label: Models }
+
     admin.part:
         class: App\Admin\PartAdmin
         tags:
