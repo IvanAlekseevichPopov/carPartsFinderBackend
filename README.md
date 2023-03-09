@@ -11,14 +11,13 @@ TODO
 +add deploy configuration to new server
 +add simple images crawler
 +admin for brands
-
-admin for modifications
-
-
-optimistic lockieng for part update, to avoid loss of "suitable for models"
++admin for modifications
 
 
 ssl for http
+
+
+optimistic lockieng for part update, to avoid loss of "suitable for models"
 image resize and change type to lightest(PNG?) right after upload
 add test provider for image storing
 add flag for moderation to parts and images

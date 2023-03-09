@@ -235,6 +235,7 @@ class PartsNumbersSearchCommand extends Command
             }
             $this->entityManager->persist($part);
         }
+        //TODO optimistic lock here
         $part->addSuitableModel($model);
 
         return $part;
