@@ -6,6 +6,7 @@ use App\Entity\Brand;
 use App\Entity\CarModel;
 use App\Entity\Part;
 use App\Entity\PartName;
+use App\Exception\TimeoutException;
 use App\Repository\BrandRepository;
 use App\Repository\CarModelRepository;
 use App\Repository\PartNameRepository;
@@ -20,6 +21,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
@@ -30,6 +32,8 @@ use Symfony\Component\Lock\LockFactory;
 )]
 class PartsNumbersSearchCommand extends Command
 {
+    use TimerTrait;
+
     private EntityManagerInterface $entityManager;
     private BrandRepository $brandRepository;
     private CarModelRepository $carModelRepository;
@@ -67,34 +71,40 @@ class PartsNumbersSearchCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('brand', InputArgument::OPTIONAL, 'Which brand to parse. Use brand name');
+            ->addArgument('brand', InputArgument::OPTIONAL, 'Which brand to parse. Use brand name')
+            ->addOption('ttl', 't', InputOption::VALUE_REQUIRED, 'Max lifetime of command in seconds', 600);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->startTimer($input->getOption('ttl'));
         $this->io = new SymfonyStyle($input, $output);
 
         $brand = $this->getBrand($input);
-        if ($brand) {
-            $this->io->title("Searching parts for single brand {$brand->getName()}");
-            $models = $this->carModelRepository->findAllToParseByBrand($brand);
-
-            $this->processModels($models);
-        } else {
-            $brands = $this->brandRepository->findAllToParseParts();
-            $this->io->title('Searching parts for all brands: '.count($brands));
-
-            foreach ($brands as $brand) {
-                $this->io->writeln("Searching parts for brand {$brand->getName()}");
-
+        try {
+            if ($brand) {
+                $this->io->title("Searching parts for single brand {$brand->getName()}");
                 $models = $this->carModelRepository->findAllToParseByBrand($brand);
 
                 $this->processModels($models);
+            } else {
+                $brands = $this->brandRepository->findAllToParseParts();
+                $this->io->title('Searching parts for all brands: '.count($brands));
 
-                $this->io->writeln("Done searching parts for brand {$brand->getName()}. Clearing entity manager");
-                $this->entityManager->clear();
-                gc_collect_cycles();
+                foreach ($brands as $brand) {
+                    $this->io->writeln("Searching parts for brand {$brand->getName()}");
+
+                    $models = $this->carModelRepository->findAllToParseByBrand($brand);
+
+                    $this->processModels($models);
+
+                    $this->io->writeln("Done searching parts for brand {$brand->getName()}. Clearing entity manager");
+                    $this->entityManager->clear();
+                    gc_collect_cycles();
+                }
             }
+        } catch (TimeoutException) {
+            $this->io->writeln('Time is out. Closing command..');
         }
 
         return Command::SUCCESS;
@@ -141,6 +151,9 @@ class PartsNumbersSearchCommand extends Command
             $nodesResponse = json_decode($nodesRes->getBody()->getContents(), true);
             foreach ($nodesResponse['nodes'] as $rawNodeData) {
                 $this->processNode($rawNodeData, $rawModificationData['id'], $model);
+                if ($this->isTimeOut()) {
+                    throw new TimeoutException();
+                }
             }
             $alreadyProcessed->set(true);
             $this->cache->save($alreadyProcessed);

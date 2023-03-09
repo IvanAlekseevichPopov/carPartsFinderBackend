@@ -12,12 +12,15 @@ TODO
 +add simple images crawler
 +admin for brands
 +admin for modifications
++ssl for http
++timeout it command-line
 
 
-ssl for http
+cron to parse in prod
 
 
-optimistic lockieng for part update, to avoid loss of "suitable for models"
+
+optimistic locking for part update, to avoid loss of "suitable for models"
 image resize and change type to lightest(PNG?) right after upload
 add test provider for image storing
 add flag for moderation to parts and images
