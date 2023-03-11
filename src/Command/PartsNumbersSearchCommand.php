@@ -17,6 +17,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -44,6 +45,7 @@ class PartsNumbersSearchCommand extends Command
     private LockFactory $lockFactory;
 
     private SymfonyStyle $io;
+    private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -54,6 +56,7 @@ class PartsNumbersSearchCommand extends Command
         ClientInterface $parserClient,
         CacheItemPoolInterface $dbCache,
         LockFactory $lockFactory,
+        LoggerInterface $logger,
         string $name = null
     ) {
         parent::__construct($name);
@@ -66,6 +69,7 @@ class PartsNumbersSearchCommand extends Command
         $this->client = $parserClient;
         $this->cache = $dbCache;
         $this->lockFactory = $lockFactory;
+        $this->logger = $logger;
     }
 
     protected function configure(): void
@@ -78,7 +82,6 @@ class PartsNumbersSearchCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->startTimer($input->getOption('ttl'));
-        $this->io = new SymfonyStyle($input, $output);
 
         $brand = $this->getBrand($input);
         try {
@@ -89,22 +92,22 @@ class PartsNumbersSearchCommand extends Command
                 $this->processModels($models);
             } else {
                 $brands = $this->brandRepository->findAllToParseParts();
-                $this->io->title('Searching parts for all brands: '.count($brands));
+                $this->logger->notice('Searching parts for all brands: '.count($brands));
 
                 foreach ($brands as $brand) {
-                    $this->io->writeln("Searching parts for brand {$brand->getName()}");
+                    $this->logger->notice("Searching parts for brand {$brand->getName()}");
 
                     $models = $this->carModelRepository->findAllToParseByBrand($brand);
 
                     $this->processModels($models);
 
-                    $this->io->writeln("Done searching parts for brand {$brand->getName()}. Clearing entity manager");
+                    $this->logger->notice("Done searching parts for brand {$brand->getName()}. Clearing entity manager");
                     $this->entityManager->clear();
                     gc_collect_cycles();
                 }
             }
         } catch (TimeoutException) {
-            $this->io->writeln('Time is out. Closing command..');
+            $this->logger->notice('Time is out. Closing command..');
         }
 
         return Command::SUCCESS;
@@ -112,11 +115,11 @@ class PartsNumbersSearchCommand extends Command
 
     protected function processModels(array $models)
     {
-        $this->io->writeln('Start parsing car models');
+        $this->logger->notice('Start parsing car models');
         foreach ($models as $model) {
             $lock = $this->lockFactory->createLock(Locks::PARSING_PARTS_MODEL.$model->getId());
             if (false === $lock->acquire()) {
-                $this->io->writeln("Lock is already acquired. Skipping model {$model->getName()}");
+                $this->logger->notice("Lock is already acquired. Skipping model {$model->getName()}");
                 continue;
             }
             try {
@@ -130,7 +133,7 @@ class PartsNumbersSearchCommand extends Command
 
     private function processOneModel(CarModel $model)
     {
-        $this->io->writeln("Start parsing car model {$model->getName()}");
+        $this->logger->notice("Start parsing car model {$model->getName()}");
         $brand = $model->getBrand();
         $res = $this->client->get("/api/catalogs/tecdoc/brands/{$brand->getExternalId()}/models/{$model->getExternalId()}/modifications");
         $modificationsResponse = json_decode($res->getBody()->getContents(), true);
@@ -139,10 +142,10 @@ class PartsNumbersSearchCommand extends Command
             if ('Мотоцикл' === $rawModificationData['constructionType']) {
                 continue;
             }
-            $this->io->writeln("Start parsing modification {$model->getName()} {$rawModificationData['name']} {$rawModificationData['constructionType']}");
+            $this->logger->notice("Start parsing modification {$model->getName()} {$rawModificationData['name']} {$rawModificationData['constructionType']}");
             $alreadyProcessed = $this->cache->getItem("modification_{$rawModificationData['id']}");
             if ($alreadyProcessed->isHit() && true === $alreadyProcessed->get()) {
-                $this->io->writeln("Modification {$rawModificationData['id']} already processed");
+                $this->logger->notice("Modification {$rawModificationData['id']} already processed");
                 continue;
             }
             usleep(random_int(10000, 100000));
@@ -157,7 +160,7 @@ class PartsNumbersSearchCommand extends Command
             }
             $alreadyProcessed->set(true);
             $this->cache->save($alreadyProcessed);
-            $this->io->writeln('Finished modification. Clearing');
+            $this->logger->notice('Finished modification. Clearing');
             $this->entityManager->flush();
             $this->entityManager->clear();
             gc_collect_cycles();
@@ -166,14 +169,14 @@ class PartsNumbersSearchCommand extends Command
         $model->setChildrenPartsParsed(true);
         $this->entityManager->flush();
 
-        $this->io->writeln("Start parsing car model {$model->getName()}");
+        $this->logger->notice("Start parsing car model {$model->getName()}");
     }
 
     private function processNode(array $rawNodeData, int $modificationId, CarModel $model)
     {
         $lock = $this->lockFactory->createLock(Locks::PARSING_PARTS_NODE.$rawNodeData['id'].'_'.$modificationId);
         if (false === $lock->acquire()) {
-            $this->io->writeln("Lock is already acquired. Skipping node {$rawNodeData['id']}");
+            $this->logger->notice("Lock is already acquired. Skipping node {$rawNodeData['id']}");
 
             return;
         }
@@ -184,7 +187,7 @@ class PartsNumbersSearchCommand extends Command
         $id = $rawNodeData['id'];
         $alreadyProcessed = $this->cache->getItem("node_{$modificationId}_{$id}");
         if ($alreadyProcessed->isHit()) {
-//            $this->io->writeln("Node {$modificationId}_{$id} already processed");
+            $this->logger->notice("Node {$modificationId}_{$id} already processed");
 
             return;
         }
@@ -202,7 +205,7 @@ class PartsNumbersSearchCommand extends Command
                 $this->entityManager->flush();
             }
         } catch (ServerException|ConnectException $e) {
-            $this->io->writeln($e->getMessage());
+            $this->logger->warning("Guzzle error: ". $e->getMessage());
 
             $item = $this->cache->getItem('failed_nodes_'.$brand->getName());
             $value = $item->get() ?? [];
@@ -242,7 +245,7 @@ class PartsNumbersSearchCommand extends Command
         $part = $this->partRepository->findOneBy(['partNumber' => $partNumber]);
         if (!$part) {
             $part = new Part($partNumber, $partName, $brand);
-            $this->io->writeln("New part {$part->getPartNumber()}");
+            $this->logger->notice("New part {$part->getPartNumber()}");
             if (!empty($images)) {
                 $part->setImagesToParse($images);
             }
