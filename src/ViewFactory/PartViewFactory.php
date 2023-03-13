@@ -8,14 +8,17 @@ use App\DBAL\Types\Enum\ViewTypeEnum;
 use App\Entity\Part;
 use App\Model\View\PartDetailedView;
 use App\Model\View\PartView;
+use Symfony\Component\Asset\Packages;
 
 class PartViewFactory
 {
     private ImageViewFactory $imageViewFactory;
+    private Packages $assetsManager;
 
-    public function __construct(ImageViewFactory $imageViewFactory)
+    public function __construct(ImageViewFactory $imageViewFactory, Packages $assetsManager)
     {
         $this->imageViewFactory = $imageViewFactory;
+        $this->assetsManager = $assetsManager;
     }
 
     private function createBaseView(Part $part, $viewType = ViewTypeEnum::LIST_ITEM): PartView
@@ -61,8 +64,7 @@ class PartViewFactory
             return $images[0];
         }
 
-        return null;
-
+        return $this->assetsManager->getUrl('app/img/404.png');
         //TODO log that part has no images in database
     }
 }
