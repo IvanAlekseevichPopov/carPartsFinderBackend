@@ -44,6 +44,7 @@ class PartViewFactory
         $view->partNumber = $part->getPartNumber();
         $view->manufacturer = $part->getBrand()->getName(); // TODO заменить на id + словарный метод для производителей
         $view->name = $part->getPartName()->getName(); // TODO translate to russian. English name is default and stored in DB
+        $view->previewImage = $this->getDraftImagePreview($part);
 
         return $view;
     }
@@ -51,5 +52,17 @@ class PartViewFactory
     public function createListView(array $parts): array
     {
         return array_map([$this, 'creatSingleView'], $parts);
+    }
+
+    private function getDraftImagePreview(Part $part)
+    {
+        $images = $part->getImagesToParse();
+        if(!empty($images)) {
+            return $images[0];
+        }
+
+        return null;
+
+        //TODO log that part has no images in database
     }
 }

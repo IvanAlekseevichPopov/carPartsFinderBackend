@@ -9,6 +9,6 @@ class PartView
     public string $id;
     public string $partNumber;
     public string $name;
-    public string $previewImage;
+    public ?string $previewImage;
     public string $manufacturer;
 }
