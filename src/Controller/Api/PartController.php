@@ -53,7 +53,7 @@ class PartController extends AbstractController
         Part $part,
         PartViewFactory $viewFactory,
     ): PartView {
-        return $viewFactory->creatSingleView($part, ViewTypeEnum::DETAILED_ITEM);
+        return $viewFactory->creatSingleView($part);
     }
 
     #[Route('/api/parts/{id}/images')]

@@ -10,7 +10,7 @@ use App\Model\View\ImageView;
 
 class ImageViewFactory
 {
-    public function createSingleView(PartImage $image, $viewType = ViewTypeEnum::LIST_ITEM): ImageView
+    public function createSingleView(PartImage $image): ImageView
     {
         $view = new ImageView();
         $view->id = $image->getId();
