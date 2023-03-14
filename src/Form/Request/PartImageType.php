@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller\Form\Request;
+namespace App\Form\Request;
 
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
