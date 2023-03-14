@@ -44,7 +44,6 @@ class PartsNumbersSearchCommand extends Command
     private CacheItemPoolInterface $cache;
     private LockFactory $lockFactory;
 
-    private SymfonyStyle $io;
     private LoggerInterface $logger;
 
     public function __construct(
@@ -86,7 +85,7 @@ class PartsNumbersSearchCommand extends Command
         $brand = $this->getBrand($input);
         try {
             if ($brand) {
-                $this->io->title("Searching parts for single brand {$brand->getName()}");
+                $this->logger->notice("Searching parts for single brand {$brand->getName()}");
                 $models = $this->carModelRepository->findAllToParseByBrand($brand);
 
                 $this->processModels($models);
