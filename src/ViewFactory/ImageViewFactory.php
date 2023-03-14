@@ -6,7 +6,9 @@ namespace App\ViewFactory;
 
 use App\DBAL\Types\Enum\ViewTypeEnum;
 use App\Entity\File\PartImage;
+use App\Entity\Part;
 use App\Model\View\ImageView;
+use Ramsey\Uuid\Uuid;
 
 class ImageViewFactory
 {
@@ -22,5 +24,22 @@ class ImageViewFactory
     public function createListView(array $images): array
     {
         return array_map([$this, 'createSingleView'], $images);
+    }
+
+    public function createLegacyListView(Part $part): array
+    {
+        $views = [];
+
+        foreach ($part->getImagesToParse() as $path) {
+            $view = new ImageView();
+            $view->id = Uuid::uuid6()->toString();
+            $view->rating = null;
+            $view->voicesCount = 0;
+            $view->path = $path;
+
+            $views[] = $view;
+        }
+
+        return $views;
     }
 }
