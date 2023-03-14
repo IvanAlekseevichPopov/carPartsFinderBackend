@@ -1,8 +1,8 @@
 ### get parts
-GET https://ivan.alekseevich.popov.fvds.ru/api/parts
+GET {{host}}/api/parts
 
 ### get one part
-GET https://ivan.alekseevich.popov.fvds.ru/api/parts/0186dbee-0f9a-7244-bec7-d5c0664615db
+GET {{host}}/api/parts/0186dbee-0f9a-7244-bec7-d5c0664615db
 
 ### get images of part
-GET https://ivan.alekseevich.popov.fvds.ru/api/parts/0186dbee-0f9a-7244-bec7-d5c0664615db/images
+GET {{host}}/api/parts/0186b718-bfc5-714b-89da-3227cf2d6991/images
