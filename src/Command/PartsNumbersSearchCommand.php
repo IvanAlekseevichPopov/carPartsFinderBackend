@@ -205,7 +205,7 @@ class PartsNumbersSearchCommand extends Command
                 $this->entityManager->flush();
             }
         } catch (ServerException|ConnectException $e) {
-            $this->logger->warning("Guzzle error: ". $e->getMessage());
+            $this->logger->warning('Guzzle error: '.$e->getMessage());
 
             $item = $this->cache->getItem('failed_nodes_'.$brand->getName());
             $value = $item->get() ?? [];
