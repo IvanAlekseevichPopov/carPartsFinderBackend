@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Guzzle;
 
 use GuzzleHttp\Client;
+use LogicException;
 
 class ParserClientFactory
 {
@@ -69,6 +70,6 @@ class ParserClientFactory
                     'Sec-fetch-site' => 'same-site',
                 ];
         }
-        throw new \LogicException('No headers collection selected');
+        throw new LogicException('No headers collection selected');
     }
 }
