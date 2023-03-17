@@ -30,4 +30,17 @@ class PartRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findByBrandName(string $brandName): iterable
+    {
+        $qb = $this->createQueryBuilder('part');
+
+        //TODO add flag, that part was parsed
+        return $qb
+            ->join('part.brand', 'brand')
+            ->where($qb->expr()->eq($qb->expr()->lower('brand.name'), ':brandName'))
+            ->setParameter('brandName', $brandName)
+            ->getQuery()
+            ->toIterable();
+    }
 }

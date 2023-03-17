@@ -29,10 +29,11 @@ class PartController extends AbstractController
 {
     #[Route('/api/parts')]
     public function getPartsList(
-        Request $request,
-        PartRepository $partRepository,
+        Request         $request,
+        PartRepository  $partRepository,
         PartViewFactory $viewFactory,
-    ): array|FormInterface {
+    ): array|FormInterface
+    {
         $query = new BaseQuery();
 
         $form = $this->createForm(BaseQueryType::class, $query);
@@ -49,19 +50,21 @@ class PartController extends AbstractController
     // TODO remove???? what about manufacturer?
     #[Route('/api/parts/{id}')]
     public function getOnePart(
-        Part $part,
+        Part            $part,
         PartViewFactory $viewFactory,
-    ): PartView {
+    ): PartView
+    {
         return $viewFactory->creatSingleView($part);
     }
 
     #[Route('/api/parts/{id}/images')]
     public function getPartImages(
-        Part $part,
-        Request $request,
+        Part                $part,
+        Request             $request,
         PartImageRepository $partImageRepository,
-        ImageViewFactory $viewFactory,
-    ): array|FormInterface {
+        ImageViewFactory    $viewFactory,
+    ): array|FormInterface
+    {
         $query = new PartImageQuery($part);
 
         $form = $this->createForm(BaseQueryType::class, $query);
@@ -76,8 +79,12 @@ class PartController extends AbstractController
         return $viewFactory->createLegacyListView($part);
     }
 
-    #[Route('/api/files/{id}', name: 'api_download_image', methods: ['GET'])]
-    public function getImage(PartImage $image, FilesystemOperator $operator, LoggerInterface $logger): Response
+    #[Route('/api/images/{id}', name: 'api_download_image', methods: ['GET'])]
+    public function getImage(
+        PartImage          $image,
+        FilesystemOperator $operator,
+        LoggerInterface    $logger
+    ): Response
     {
         try {
 //           TODO checksum сравнение и логгирование несовпадений
@@ -96,7 +103,7 @@ class PartController extends AbstractController
             $logger->warning("Unable to download image: {$image->getId()}", ['exception' => $e]);
 
             return new BinaryFileResponse(
-                $this->getParameter('kernel.project_dir').'/public/app/img/404.png',
+                $this->getParameter('kernel.project_dir') . '/public/app/img/404.png',
                 Response::HTTP_OK,
                 ['Content-Type' => 'image/png', 'max-age' => 300] // 5 min
             );

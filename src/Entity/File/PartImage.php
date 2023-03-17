@@ -62,6 +62,11 @@ class PartImage
         return '/tmp/'.$this->getId();
     }
 
+    public function getPublicFilePath(): string
+    {
+        return '/api/images/'.$this->getId();
+    }
+
     public function getUploadedBy(): UserInterface
     {
         return $this->uploadedBy;

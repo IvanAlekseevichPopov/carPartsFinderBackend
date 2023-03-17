@@ -13,6 +13,7 @@ use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Throwable;
 
 class ImageCreator
 {
@@ -50,7 +51,7 @@ class ImageCreator
 
         try {
             $this->fileSystemOperator->write($entity->getStorageFilePath(), $file->getContent());
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->dataStorageOperator->delete($entity);
             throw $e;
         }

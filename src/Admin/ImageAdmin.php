@@ -93,7 +93,12 @@ class ImageAdmin extends AppAbstractAdmin
             ->add('part', null, [
                 'associated_property' => 'partName.name',
             ])
+            //TODO remove method, сделать как поле с кнопками ниже
+            ->add('getPublicFilePath', null, [
+                'template' => 'admin/part_image_preview.html.twig',
+            ])
             ->add('rating')
+//            ->add()
             ->add(ListMapper::NAME_ACTIONS, null, [
                 'actions' => [
                     'edit' => [],
