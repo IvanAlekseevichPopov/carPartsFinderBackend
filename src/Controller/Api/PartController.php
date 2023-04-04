@@ -65,14 +65,15 @@ class PartController extends AbstractController
         $query = new PartImageQuery($part);
 
         $form = $this->createForm(BaseQueryType::class, $query);
-        $form->submit($request->query->all());
+        $form->submit($request->query->all(), false);
         if (!$form->isValid()) {
             return $form; // TODO exception
         }
 
-        $imageList = $partImageRepository->findByQuery($query);
+//        $imageList = $partImageRepository->findByQuery($query);
 
-        return $viewFactory->createListView($imageList);
+//        return $viewFactory->createListView($imageList);
+        return $viewFactory->createLegacyListView($part);
     }
 
     #[Route('/api/files/{id}', name: 'api_download_image', methods: ['GET'])]

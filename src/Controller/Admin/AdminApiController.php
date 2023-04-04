@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
-use App\Controller\Form\Request\PartImageType;
 use App\Entity\Part;
+use App\Form\Request\PartImageType;
 use App\Service\Image\ImageCreator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
