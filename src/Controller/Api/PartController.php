@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\DBAL\Types\Enum\ViewTypeEnum;
 use App\Entity\File\Image;
 use App\Entity\File\PartImage;
 use App\Entity\Part;
@@ -53,7 +52,7 @@ class PartController extends AbstractController
         Part $part,
         PartViewFactory $viewFactory,
     ): PartView {
-        return $viewFactory->creatSingleView($part, ViewTypeEnum::DETAILED_ITEM);
+        return $viewFactory->creatSingleView($part);
     }
 
     #[Route('/api/parts/{id}/images')]
@@ -66,14 +65,15 @@ class PartController extends AbstractController
         $query = new PartImageQuery($part);
 
         $form = $this->createForm(BaseQueryType::class, $query);
-        $form->submit($request->query->all());
+        $form->submit($request->query->all(), false);
         if (!$form->isValid()) {
             return $form; // TODO exception
         }
 
-        $imageList = $partImageRepository->findByQuery($query);
+//        $imageList = $partImageRepository->findByQuery($query);
 
-        return $viewFactory->createListView($imageList);
+//        return $viewFactory->createListView($imageList);
+        return $viewFactory->createLegacyListView($part);
     }
 
     #[Route('/api/files/{id}', name: 'api_download_image', methods: ['GET'])]

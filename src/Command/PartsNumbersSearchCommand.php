@@ -24,7 +24,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Lock\LockFactory;
 
 #[AsCommand(
@@ -44,7 +43,6 @@ class PartsNumbersSearchCommand extends Command
     private CacheItemPoolInterface $cache;
     private LockFactory $lockFactory;
 
-    private SymfonyStyle $io;
     private LoggerInterface $logger;
 
     public function __construct(
@@ -86,7 +84,7 @@ class PartsNumbersSearchCommand extends Command
         $brand = $this->getBrand($input);
         try {
             if ($brand) {
-                $this->io->title("Searching parts for single brand {$brand->getName()}");
+                $this->logger->notice("Searching parts for single brand {$brand->getName()}");
                 $models = $this->carModelRepository->findAllToParseByBrand($brand);
 
                 $this->processModels($models);
@@ -205,7 +203,7 @@ class PartsNumbersSearchCommand extends Command
                 $this->entityManager->flush();
             }
         } catch (ServerException|ConnectException $e) {
-            $this->logger->warning("Guzzle error: ". $e->getMessage());
+            $this->logger->warning('Guzzle error: '.$e->getMessage());
 
             $item = $this->cache->getItem('failed_nodes_'.$brand->getName());
             $value = $item->get() ?? [];

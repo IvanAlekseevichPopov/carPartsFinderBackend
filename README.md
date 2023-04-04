@@ -14,9 +14,7 @@ TODO
 +admin for modifications
 +ssl for http
 +timeout it command-line
-
-
-cron to parse in prod
++cron to parse in prod
 
 
 

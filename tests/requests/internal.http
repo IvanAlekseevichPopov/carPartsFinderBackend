@@ -1,0 +1,8 @@
+### get parts
+GET {{host}}/api/parts
+
+### get one part
+GET {{host}}/api/parts/01874bb1-1ba1-737c-9054-785fc3fcf9aa
+
+### get images of part
+GET {{host}}/api/parts/01874bb1-1ba1-737c-9054-785fc3fcf9aa/images
