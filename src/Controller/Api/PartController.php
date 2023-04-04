@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controller\Api;
 
-use App\DBAL\Types\Enum\ViewTypeEnum;
 use App\Entity\File\Image;
 use App\Entity\File\PartImage;
 use App\Entity\Part;

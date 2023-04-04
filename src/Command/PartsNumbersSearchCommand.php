@@ -13,6 +13,7 @@ use App\Repository\PartNameRepository;
 use App\Repository\PartRepository;
 use App\Service\Locks;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\OptimisticLockException;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
@@ -202,10 +203,9 @@ class PartsNumbersSearchCommand extends Command
                 $partName = $this->findOrCreatePartName($rawSparePartData['name']);
 
                 $this->findOrCreatePart($brand, $partName, $model, $rawSparePartData['partNumber'], $rawSparePartData['imageUrls'] ?? null);
-                $this->entityManager->flush();
             }
         } catch (ServerException|ConnectException $e) {
-            $this->logger->warning("Guzzle error: ". $e->getMessage());
+            $this->logger->warning('Guzzle error: '.$e->getMessage());
 
             $item = $this->cache->getItem('failed_nodes_'.$brand->getName());
             $value = $item->get() ?? [];
@@ -242,6 +242,9 @@ class PartsNumbersSearchCommand extends Command
 
     private function findOrCreatePart(Brand $brand, PartName $partName, CarModel $model, string $partNumber, ?array $images = null): Part
     {
+        $lock = $this->lockFactory->createLock(Locks::PARSING_PARTS_MODEL.$model->getId(), 10);
+        $lock->acquire(true);
+
         $part = $this->partRepository->findOneBy(['partNumber' => $partNumber]);
         if (!$part) {
             $part = new Part($partNumber, $partName, $brand);
@@ -253,6 +256,14 @@ class PartsNumbersSearchCommand extends Command
         }
         // TODO optimistic lock here
         $part->addSuitableModel($model);
+
+        try {
+            $this->entityManager->flush();
+        } catch (OptimisticLockException $e) {
+            $this->logger->critical("Optimistic lock exception: {$e->getMessage()}");
+        } finally {
+            $lock->release();
+        }
 
         return $part;
     }

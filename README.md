@@ -14,13 +14,15 @@ TODO
 +admin for modifications
 +ssl for http
 +timeout it command-line
-
-
-cron to parse in prod
++cron to parse in prod
 
 
 
 optimistic locking for part update, to avoid loss of "suitable for models"
+
+
+
+add slow log in postgres
 image resize and change type to lightest(PNG?) right after upload
 add test provider for image storing
 add flag for moderation to parts and images
