@@ -2,7 +2,7 @@
 GET {{host}}/api/parts
 
 ### get one part
-GET {{host}}/api/parts/0186dbee-0f9a-7244-bec7-d5c0664615db
+GET {{host}}/api/parts/01874bb1-1ba1-737c-9054-785fc3fcf9aa
 
 ### get images of part
-GET {{host}}/api/parts/0186b718-bfc5-714b-89da-3227cf2d6991/images
+GET {{host}}/api/parts/01874bb1-1ba1-737c-9054-785fc3fcf9aa/images
