@@ -38,11 +38,11 @@ class PartViewFactory
     private function getDraftImagePreview(Part $part)
     {
         $images = $part->getImagesToParse();
-        if(!empty($images)) {
+        if (!empty($images)) {
             return $images[0];
         }
 
         return $this->assetsManager->getUrl('app/img/404.png');
-        //TODO log that part has no images in database
+        // TODO log that part has no images in database
     }
 }
