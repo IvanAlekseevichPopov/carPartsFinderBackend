@@ -77,11 +77,6 @@ class Part
         return $this->images;
     }
 
-    public function addSu($m): void
-    {
-        $this->suitableForModels[] = $m;
-    }
-
     public function addSuitableModel(CarModel $model): void
     {
         if (in_array($model->getId(), $this->suitableForModels)) {
