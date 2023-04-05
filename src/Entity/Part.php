@@ -7,6 +7,8 @@ namespace App\Entity;
 use App\Entity\File\PartImage;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Version;
 use Ramsey\Uuid\Uuid;
 
 #[ORM\Table(
@@ -20,6 +22,9 @@ class Part
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
     protected string $id;
+
+    #[Version, Column(type: 'integer')]
+    private int $version;
 
     #[ORM\Column]
     protected string $partNumber;
